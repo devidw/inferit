@@ -46,9 +46,10 @@
     nodeTypes={node_types}
     fitView
     proOptions={{ hideAttribution: true }}
+    snapGrid={[25, 25]}
   >
     <Controls showZoom={false} showLock={false}>
-      <ControlButton onclick={add_node}>
+      <ControlButton onclick={() => add_node()}>
         <div class="i-eva:plus-outline"></div>
       </ControlButton>
       <ControlButton onclick={toggle_settings}>
