@@ -6,10 +6,10 @@
 
 _inferit_ is a visual take on llm inference. Most inference frontends are
 limited to a single visual input/output "thread". This makes it hard to compare
-output from different models, prompts and sampler settings. _inferit_ solves this its UI
-that allows for an unlimited number of side-by-side generations. This makes it
-possible to easily compare which models, prompts and sampler settings lead to
-which output.
+output from different models, prompts and sampler settings. _inferit_ solves
+this with its UI that allows for an unlimited number of side-by-side
+generations. This makes it a perfect fit to compare and experiment with
+different models, prompts and sampler settings.
 
 Use cases:
 
