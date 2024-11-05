@@ -1,0 +1,9 @@
+input,
+select,
+textarea {
+  --at-apply: "bg-transparent outline-none block";
+}
+
+textarea {
+  --at-apply: "resize-none";
+}
