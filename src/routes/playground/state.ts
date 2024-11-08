@@ -36,32 +36,37 @@ export const model_names = [
   "athirdpath/NSFW_DPO_Noromaid-7b",
 ]
 
-async function on_output({
-  id,
+export async function on_output({
+  thread_id,
+  src_id,
   output,
   type,
 }: {
-  id: string
+  thread_id: string
+  src_id: string
   output: string
   type: "error" | "success"
 }) {
-  const new_id = String(Date.now())
+  const next_bot_node_id = String(Date.now())
 
-  const src_node = get(nodes).find((node) => node.id === id)
-  console.info({ src_node })
+  const src_node = get(nodes).find((node) => node.id === src_id)
+  // console.info({ src_node })
 
   if (!src_node) {
     return
   }
 
   nodes.update((the_nodes) => {
-    the_nodes.push({
-      id: new_id,
-      type: "custom-output",
+    const node: Node = {
+      id: next_bot_node_id,
+      type: "custom-bot-node",
       data: {
-        id: new_id,
-        content: output,
+        thread_id: thread_id,
+        src_id,
+        id: next_bot_node_id,
         type,
+        content: output,
+        content_chunks: [],
       },
       position: {
         x: src_node.position.x + 50 * Math.random(),
@@ -70,7 +75,9 @@ async function on_output({
           (src_node.measured?.height ?? 0.1) +
           50 * Math.random(),
       },
-    })
+    }
+
+    the_nodes.push(node)
 
     return the_nodes
   })
@@ -78,22 +85,28 @@ async function on_output({
   edges.update((the_edges) => {
     the_edges.push({
       id: String(Math.random()),
-      source: id,
-      target: new_id,
+      source: src_id,
+      target: next_bot_node_id,
     })
 
     return the_edges
   })
 
-  return new_id
+  return next_bot_node_id
 }
 
-function on_output_chunk({ id, text }: { id: string; text: string }) {
+export function on_output_chunk({ id, text }: { id: string; text: string }) {
   nodes.update((the_nodes) => {
     const node = the_nodes.find((node) => node.id === id)
 
     if (node) {
       node.data.content += text
+
+      if (!Array.isArray(node.data.content_chunks)) {
+        node.data.content_chunks = []
+      } else {
+        node.data.content_chunks = [...node.data.content_chunks, text]
+      }
     }
 
     return the_nodes

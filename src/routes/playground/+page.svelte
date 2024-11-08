@@ -9,13 +9,15 @@
   import { ControlButton, type NodeTypes } from "@xyflow/svelte"
   import Infer from "./infer.svelte"
   import { nodes, edges, add_node } from "./state.js"
-  import Output from "./output.svelte"
+  import BotNode from "./bot_node.svelte"
+  import UserNode from "./user_node.svelte"
   import Settings from "./settings.svelte"
   import { onMount } from "svelte"
 
   const node_types: NodeTypes = {
     "custom-infer": Infer,
-    "custom-output": Output,
+    "custom-bot-node": BotNode,
+    "custom-user-node": UserNode,
   }
 
   let show_settings = false
@@ -46,7 +48,6 @@
     nodeTypes={node_types}
     fitView
     proOptions={{ hideAttribution: true }}
-    snapGrid={[25, 25]}
   >
     <Controls showZoom={false} showLock={false}>
       <ControlButton onclick={() => add_node()}>

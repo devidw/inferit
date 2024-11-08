@@ -1,45 +1,24 @@
 <script lang="ts">
   import { Handle, Position } from "@xyflow/svelte"
   import autosize from "svelte-autosize"
-  import { edges, nodes, model_names, add_node, settings } from "./state.js"
+  import { edges, nodes, model_names, add_node } from "./state.js"
   import DropBtn from "./drop_btn.svelte"
-  import { OpenAI } from "openai"
-
-  const api_client = $derived(
-    new OpenAI({
-      baseURL: $settings.base_url,
-      apiKey: $settings.api_key,
-      dangerouslyAllowBrowser: true,
-    })
-  )
+  import NextBtn from "./next_btn.svelte"
+  import { writable } from "svelte/store"
+  import type { Params } from "./types.js"
+  import { infer_it } from "./infer_it.js"
 
   let {
     data,
   }: {
     data: {
       id: string
-      on_output: (a: {
-        id: string
-        output: string
-        type: "error" | "success"
-      }) => Promise<string>
-      on_output_chunk: (a: { id: string; text: string }) => void
       params: Params
     }
   } = $props()
 
-  type Params = {
-    prompt: string
-    model: string
-    max_tokens: number
-    temperature: number
-    top_p: number
-    top_k: number
-    stop: string
-    min_p: number
-  }
+  const status = writable<"idle" | "busy">("idle")
 
-  let status: "idle" | "busy" = $state("idle")
   let params: Params = $state(
     data.params ?? {
       model: "vicgalle/Roleplay-Llama-3-8B",
@@ -54,35 +33,6 @@
   )
   let textarea: HTMLTextAreaElement | null = $state(null)
 
-  async function on_submit(submit_event: SubmitEvent) {
-    try {
-      submit_event.preventDefault()
-
-      status = "busy"
-
-      const stream = await api_client.completions.create({
-        ...params,
-        stop: [params.stop === "\\n" ? "\n" : ""],
-        stream: true,
-      })
-
-      const out_id = await data.on_output({
-        id: data.id,
-        output: "",
-        type: "success",
-      })
-
-      for await (const chunk of stream) {
-        data.on_output_chunk({ id: out_id, text: chunk.choices[0].text })
-      }
-    } catch (e) {
-      await data.on_output({ id: data.id, output: e.message, type: "error" })
-      console.error(e)
-    } finally {
-      status = "idle"
-    }
-  }
-
   function drop_me() {
     const connected_ones = $edges.filter((edge) => edge.source === data.id)
     const ids_to_drop = [data.id, ...connected_ones.map((edge) => edge.target)]
@@ -92,30 +42,42 @@
   function fork_me() {
     add_node({ params: Object.assign({}, params) })
   }
+
+  $effect(() => {
+    const me = $nodes.find((node) => node.id === data.id)
+
+    if (!me) {
+      return
+    }
+
+    me.data.params = params
+  })
+
+  async function on_submit(e?: SubmitEvent) {
+    e?.preventDefault()
+
+    await infer_it({
+      thread_id: data.id,
+      src_id: data.id,
+      status,
+    })
+  }
 </script>
 
 <form
   class="box w-500px relative bg-stone-8 rounded-lg border-0.5 p2 text-xs font-mono text-stone-3
-{status === 'busy' ? 'border-cyan animate-pulse' : 'border-stone-5'}"
+{$status === 'busy' ? 'border-cyan animate-pulse' : 'border-stone-5'}"
   onsubmit={on_submit}
 >
-  <DropBtn {drop_me} disabled={status === "busy"} />
+  <DropBtn {drop_me} disabled={$status === "busy"} />
 
-  <button
-    type="submit"
-    aria-label="generate"
-    disabled={status === "busy"}
-    class="bg-cyan-7 rounded-full absolute -bottom-8px z-1 left-[calc(50%_-_8px)]
-    w-16px h-16px flex justify-center items-center"
-  >
-    <div class="i-eva:arrowhead-down-fill"></div>
-  </button>
+  <NextBtn func={on_submit} disabled={$status === "busy"} />
 
   <button
     type="button"
     onclick={fork_me}
     aria-label="fork"
-    disabled={status === "busy"}
+    disabled={$status === "busy"}
     class="bg-stone-5 rounded-full absolute -bottom-8px -right-8px z-1
     w-16px h-16px flex justify-center items-center"
   >
@@ -132,7 +94,7 @@
     <option value="e62wjcfr0yoamky">Karen</option>
   </datalist>
 
-  <fieldset class="space-y-2" disabled={status === "busy"}>
+  <fieldset class="space-y-2" disabled={$status === "busy"}>
     <label class="flex items-center space-x-2">
       <span class="w-50px">Model</span>
       <input
