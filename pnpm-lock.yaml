@@ -16,9 +16,11 @@ specifiers:
   svelte: ^5.0.0
   svelte-autosize: ^1.1.0
   svelte-check: ^4.0.0
+  tiktoken: ^1.0.17
   typescript: ^5.0.0
   unocss: ^0.63.6
   vite: ^5.0.3
+  vite-plugin-wasm: ^3.3.0
 
 devDependencies:
   '@iconify-json/eva': 1.2.0
@@ -36,9 +38,11 @@ devDependencies:
   svelte: 5.1.9
   svelte-autosize: 1.1.5_svelte@5.1.9
   svelte-check: 4.0.5_cpydd3fjxxoqkmm3txqkdohov4
+  tiktoken: 1.0.17
   typescript: 5.6.3
   unocss: 0.63.6_cmeu5ads3n33j4pe6vl4dp3d4a
   vite: 5.4.10
+  vite-plugin-wasm: 3.3.0_vite@5.4.10
 
 packages:
 
@@ -2094,6 +2098,10 @@ packages:
       zimmerframe: 1.1.2
     dev: true
 
+  /tiktoken/1.0.17:
+    resolution: {integrity: sha512-UuFHqpy/DxOfNiC3otsqbx3oS6jr5uKdQhB/CvDEroZQbVHt+qAK+4JbIooabUWKU9g6PpsFylNu9Wcg4MxSGA==}
+    dev: true
+
   /tiny-glob/0.2.9:
     resolution: {integrity: sha512-g/55ssRPUjShh+xkfx9UPDXqhckHEsHr4Vd9zX55oSdGZc/MD0m3sferOkwWtp98bv+kcVfEHtRJgBVJzelrzg==}
     dependencies:
@@ -2198,6 +2206,14 @@ packages:
       - rollup
       - supports-color
       - typescript
+    dev: true
+
+  /vite-plugin-wasm/3.3.0_vite@5.4.10:
+    resolution: {integrity: sha512-tVhz6w+W9MVsOCHzxo6SSMSswCeIw4HTrXEi6qL3IRzATl83jl09JVO1djBqPSwfjgnpVHNLYcaMbaDX5WB/pg==}
+    peerDependencies:
+      vite: ^2 || ^3 || ^4 || ^5
+    dependencies:
+      vite: 5.4.10
     dev: true
 
   /vite/5.4.10:

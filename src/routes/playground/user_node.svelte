@@ -1,11 +1,13 @@
 <script lang="ts">
   import { Handle, Position } from "@xyflow/svelte"
-  import { nodes, edges } from "./state.js"
+  import { nodes } from "./state.js"
   import DropBtn from "./drop_btn.svelte"
   import NextBtn from "./next_btn.svelte"
   import { infer_it } from "./infer_it.js"
   import { writable } from "svelte/store"
   import autosize from "svelte-autosize"
+  import { get_token_count } from "./tokens.js"
+  import { build_prompt } from "./prompts.js"
 
   let {
     data,
@@ -20,6 +22,19 @@
   const status = writable<"idle" | "busy">("idle")
 
   let content = $state("some new user message")
+  let token_count = $derived(get_token_count(content))
+
+  $effect(() => {
+    const me = $nodes.find((node) => node.id === data.id)
+
+    if (!me) {
+      return
+    }
+
+    me.data.content = content
+
+    // console.info({ content })
+  })
 
   function drop_me() {
     $nodes = $nodes.filter((node) => node.id !== data.id)
@@ -32,14 +47,19 @@
       return
     }
 
+    const thread_prompt = build_prompt({
+      node_id: data.id,
+    })
+
+    if (!thread_prompt) {
+      return
+    }
+
     await infer_it({
       thread_id: data.thread_id,
       src_id: data.id,
       status,
-      patch_params(params) {
-        params.prompt += `${src_node.data.content}\nuser: ${content}\nbot:`
-        return params
-      },
+      the_prompt: thread_prompt,
     })
   }
 </script>
@@ -65,6 +85,8 @@
     rows="1"
     placeholder="User Message"
   ></textarea>
+
+  {token_count}
 </div>
 
 <style>

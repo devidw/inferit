@@ -7,7 +7,7 @@
   } from "@xyflow/svelte"
   import "@xyflow/svelte/dist/style.css"
   import { ControlButton, type NodeTypes } from "@xyflow/svelte"
-  import Infer from "./infer.svelte"
+  import Infer from "./system_node.svelte"
   import { nodes, edges, add_node } from "./state.js"
   import BotNode from "./bot_node.svelte"
   import UserNode from "./user_node.svelte"
@@ -15,7 +15,7 @@
   import { onMount } from "svelte"
 
   const node_types: NodeTypes = {
-    "custom-infer": Infer,
+    "custom-system-node": Infer,
     "custom-bot-node": BotNode,
     "custom-user-node": UserNode,
   }
@@ -42,7 +42,7 @@
   {/if}
 
   <SvelteFlow
-    colorMode={"system"}
+    colorMode={"dark"}
     {nodes}
     {edges}
     nodeTypes={node_types}

@@ -34,6 +34,3 @@ pnpm dev
 ```
 
 Contributions of any kind are warmly welcomed!
-
-- todo: on regen open up new prompt tree / dynamically compose from node tree
-  instead of patching single prompt per thread

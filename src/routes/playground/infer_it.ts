@@ -16,12 +16,12 @@ export async function infer_it({
   thread_id,
   src_id,
   status,
-  patch_params,
+  the_prompt,
 }: {
   thread_id: string
   src_id: string
   status: Writable<"idle" | "busy">
-  patch_params?: (params: Params) => Params
+  the_prompt?: string
 }) {
   try {
     status.set("busy")
@@ -34,10 +34,10 @@ export async function infer_it({
       return
     }
 
-    let params: Params = thread_node.data.params as Params
+    let params: Params = Object.assign({}, thread_node.data.params) as Params
 
-    if (patch_params) {
-      params = patch_params(params)
+    if (the_prompt) {
+      params.prompt = the_prompt
     }
 
     const stream = await api_client.completions.create({
@@ -58,6 +58,8 @@ export async function infer_it({
     }
 
     for await (const chunk of stream) {
+      // console.info({ chunk })
+
       on_output_chunk({
         id: out_id,
         text: chunk.choices[0].text,

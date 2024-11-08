@@ -26,9 +26,11 @@
 		"svelte": "^5.0.0",
 		"svelte-autosize": "^1.1.0",
 		"svelte-check": "^4.0.0",
+		"tiktoken": "^1.0.17",
 		"typescript": "^5.0.0",
 		"unocss": "^0.63.6",
-		"vite": "^5.0.3"
+		"vite": "^5.0.3",
+		"vite-plugin-wasm": "^3.3.0"
 	},
 	"packageManager": "pnpm@7.29.1+sha512.767fbae41d97a4c2229fbb1066f048276672c7c67b2caf79ab202f8043c4f2a5e45982ff2eec297cc7caf4cb9cefeccd9e93f089082d184b3180eb6e69b1626d"
 }

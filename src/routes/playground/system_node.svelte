@@ -1,12 +1,17 @@
 <script lang="ts">
-  import { Handle, Position } from "@xyflow/svelte"
+  import { Handle, Position, useSvelteFlow } from "@xyflow/svelte"
   import autosize from "svelte-autosize"
-  import { edges, nodes, model_names, add_node } from "./state.js"
+  import {
+    edges,
+    nodes,
+    model_names,
+    add_node,
+    add_user_node,
+  } from "./state.js"
   import DropBtn from "./drop_btn.svelte"
   import NextBtn from "./next_btn.svelte"
   import { writable } from "svelte/store"
   import type { Params } from "./types.js"
-  import { infer_it } from "./infer_it.js"
 
   let {
     data,
@@ -22,7 +27,7 @@
   let params: Params = $state(
     data.params ?? {
       model: "vicgalle/Roleplay-Llama-3-8B",
-      prompt: "user: hii sweetie\nbot:",
+      prompt: "You are a friendly being.",
       max_tokens: 100,
       temperature: 1,
       top_p: 1,
@@ -53,21 +58,22 @@
     me.data.params = params
   })
 
-  async function on_submit(e?: SubmitEvent) {
-    e?.preventDefault()
+  const { screenToFlowPosition } = useSvelteFlow()
 
-    await infer_it({
+  async function on_submit(e: MouseEvent) {
+    add_user_node({
       thread_id: data.id,
       src_id: data.id,
-      status,
+      id: data.id,
+      e,
+      cords_helper: screenToFlowPosition,
     })
   }
 </script>
 
-<form
+<div
   class="box w-500px relative bg-stone-8 rounded-lg border-0.5 p2 text-xs font-mono text-stone-3
 {$status === 'busy' ? 'border-cyan animate-pulse' : 'border-stone-5'}"
-  onsubmit={on_submit}
 >
   <DropBtn {drop_me} disabled={$status === "busy"} />
 
@@ -109,7 +115,7 @@
 
     <textarea
       bind:value={params.prompt}
-      placeholder="Prompt"
+      placeholder="System Message"
       use:autosize
       class="w-full max-h-250px min-h-25px overflow-x-hidden!"
       bind:this={textarea}
@@ -162,7 +168,7 @@
   </fieldset>
 
   <Handle type="source" position={Position.Bottom} />
-</form>
+</div>
 
 <style>
   .box {

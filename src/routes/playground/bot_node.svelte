@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Handle, Position, type Node } from "@xyflow/svelte"
-  import { nodes, edges } from "./state.js"
+  import { nodes, edges, add_user_node } from "./state.js"
   import DropBtn from "./drop_btn.svelte"
   import NextBtn from "./next_btn.svelte"
   import { useSvelteFlow } from "@xyflow/svelte"
@@ -34,52 +34,12 @@
   const { screenToFlowPosition } = useSvelteFlow()
 
   function on_next(e: MouseEvent) {
-    const out = screenToFlowPosition({
-      x: e.pageX,
-      y: e.pageY,
-    })
-
-    // console.info({
-    //   page: {
-    //     x: e.pageX,
-    //     y: e.pageY,
-    //   },
-    // })
-
-    const src_node = $nodes.find((node) => node.id === data.src_id)
-
-    if (!src_node) {
-      return
-    }
-
-    const next_user_node_id = String(Date.now())
-
-    nodes.update((the_nodes) => {
-      the_nodes.push({
-        id: next_user_node_id,
-        type: "custom-user-node",
-        position: {
-          x: src_node.position.x + 20,
-          y: out.y + 20,
-        },
-        data: {
-          thread_id: data.thread_id,
-          src_id: data.id,
-          id: next_user_node_id,
-        },
-      })
-
-      return the_nodes
-    })
-
-    edges.update((the_edges) => {
-      the_edges.push({
-        id: `${data.id}_${next_user_node_id}`,
-        source: data.id,
-        target: next_user_node_id,
-      })
-
-      return the_edges
+    add_user_node({
+      thread_id: data.thread_id,
+      src_id: data.src_id,
+      id: data.id,
+      e,
+      cords_helper: screenToFlowPosition,
     })
   }
 </script>
