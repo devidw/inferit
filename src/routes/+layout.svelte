@@ -2,7 +2,10 @@
   import "@unocss/reset/tailwind.css"
   import "uno.css"
   import "./style.css"
+  import { Toaster } from "svelte-french-toast"
 </script>
+
+<Toaster position="bottom-center" />
 
 <slot />
 

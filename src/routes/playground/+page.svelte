@@ -6,13 +6,12 @@
     BackgroundVariant,
   } from "@xyflow/svelte"
   import "@xyflow/svelte/dist/style.css"
-  import { ControlButton, type NodeTypes } from "@xyflow/svelte"
+  import { ControlButton, type NodeTypes, useSvelteFlow } from "@xyflow/svelte"
   import Infer from "./system_node.svelte"
   import { nodes, edges, add_node } from "./state.js"
   import BotNode from "./bot_node.svelte"
   import UserNode from "./user_node.svelte"
   import Settings from "./settings.svelte"
-  import { onMount } from "svelte"
 
   const node_types: NodeTypes = {
     "custom-system-node": Infer,
@@ -25,11 +24,6 @@
   function toggle_settings() {
     show_settings = !show_settings
   }
-
-  onMount(() => {
-    $nodes = []
-    add_node()
-  })
 </script>
 
 <svelte:head>
@@ -49,7 +43,7 @@
     fitView
     proOptions={{ hideAttribution: true }}
   >
-    <Controls showZoom={false} showLock={false}>
+    <Controls showZoom={false} showLock={false} showFitView={true}>
       <ControlButton onclick={() => add_node()}>
         <div class="i-eva:plus-outline"></div>
       </ControlButton>

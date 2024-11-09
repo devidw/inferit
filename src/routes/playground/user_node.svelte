@@ -77,16 +77,18 @@
 
   <NextBtn func={on_next} />
 
+  <div class="absolute right-2 bottom-2 op50">
+    {token_count}
+  </div>
+
   <textarea
     bind:value={content}
-    class="w-300px"
+    class="w-300px pr4"
     use:autosize
     spellcheck="false"
     rows="1"
     placeholder="User Message"
   ></textarea>
-
-  {token_count}
 </div>
 
 <style>

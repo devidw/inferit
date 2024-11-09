@@ -84,10 +84,10 @@ export function build_prompt({ node_id }: { node_id: string }) {
       })
       .join("\n") + "\nbot:"
 
-  console.info({
-    thread_nodes,
-    the_prompt,
-  })
+  // console.info({
+  //   thread_nodes,
+  //   the_prompt,
+  // })
 
   return the_prompt
 }

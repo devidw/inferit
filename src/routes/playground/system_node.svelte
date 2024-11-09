@@ -72,8 +72,8 @@
 </script>
 
 <div
-  class="box w-500px relative bg-stone-8 rounded-lg border-0.5 p2 text-xs font-mono text-stone-3
-{$status === 'busy' ? 'border-cyan animate-pulse' : 'border-stone-5'}"
+  class="box w-500px relative bg-stone-8 rounded-lg border-0.5 p2 text-xs
+font-mono text-stone-3 border-stone-5"
 >
   <DropBtn {drop_me} disabled={$status === "busy"} />
 
@@ -124,47 +124,52 @@
         if (!textarea) return
         autosize.update(textarea)
       }}
+      rows="1"
       onfocusout={(event) => {
         event.target.style.height = "25px"
       }}
     ></textarea>
 
-    <div class="params grid grid-gap-2 grid-cols-2">
-      <label class="flex items-center space-x-2">
-        <input
-          type="number"
-          min="0"
-          step="0.1"
-          bind:value={params.temperature}
-        />
-        <div class="">temperature</div>
-      </label>
+    <details>
+      <summary class="underline op-50"> Params </summary>
 
-      <label class="flex items-center space-x-2">
-        <input type="number" min="0" step="0.1" bind:value={params.min_p} />
-        <div class="">min_p</div>
-      </label>
+      <div class="params grid grid-gap-2 grid-cols-2 mt2">
+        <label class="flex items-center space-x-2">
+          <input
+            type="number"
+            min="0"
+            step="0.1"
+            bind:value={params.temperature}
+          />
+          <div class="">temperature</div>
+        </label>
 
-      <label class="flex items-center space-x-2">
-        <input type="number" bind:value={params.top_p} />
-        <div class="">top_p</div>
-      </label>
+        <label class="flex items-center space-x-2">
+          <input type="number" min="0" step="0.1" bind:value={params.min_p} />
+          <div class="">min_p</div>
+        </label>
 
-      <label class="flex items-center space-x-2">
-        <input type="number" bind:value={params.top_k} />
-        <div class="">top_k</div>
-      </label>
+        <label class="flex items-center space-x-2">
+          <input type="number" bind:value={params.top_p} />
+          <div class="">top_p</div>
+        </label>
 
-      <label class="flex items-center space-x-2">
-        <input type="text" bind:value={params.stop} />
-        <div class="">stop</div>
-      </label>
+        <label class="flex items-center space-x-2">
+          <input type="number" bind:value={params.top_k} />
+          <div class="">top_k</div>
+        </label>
 
-      <label class="flex items-center space-x-2">
-        <input type="number" min="1" bind:value={params.max_tokens} />
-        <div class="">max_tokens</div>
-      </label>
-    </div>
+        <label class="flex items-center space-x-2">
+          <input type="text" bind:value={params.stop} />
+          <div class="">stop</div>
+        </label>
+
+        <label class="flex items-center space-x-2">
+          <input type="number" min="1" bind:value={params.max_tokens} />
+          <div class="">max_tokens</div>
+        </label>
+      </div>
+    </details>
   </fieldset>
 
   <Handle type="source" position={Position.Bottom} />

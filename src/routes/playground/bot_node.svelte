@@ -12,9 +12,6 @@
       thread_id: string
       src_id: string
       id: string
-      type: "error" | "success"
-      content: string
-      content_chunks: string[]
     }
   } = $props()
 
@@ -23,8 +20,7 @@
   // )
 
   let content_chunks: string[] = $derived(
-    $nodes.find((node) => node.id === data.id)?.data.content_chunks ??
-      data.content_chunks
+    $nodes.find((node) => node.id === data.id)?.data.content_chunks ?? []
   )
 
   function drop_me() {
@@ -46,9 +42,7 @@
 
 <div
   class="box relative bg-stone-9 border-1 border-dashed font-mono text-xs p2
-rounded-lg text-stone-3 {data.type === 'error'
-    ? 'border-red-9'
-    : ''} {data.type === 'success' ? 'border-stone-5' : ''}"
+rounded-lg text-stone-3 border-stone-6"
 >
   <!-- <div>bot {data.id}</div> -->
 
@@ -64,13 +58,18 @@ rounded-lg text-stone-3 {data.type === 'error'
   <!-- <hr /> -->
 
   <div class="w-300px whitespace-pre-wrap">
-    {#each content_chunks as chunk, index}
-      <span
-        class="hover:outline-dashed {index + 1 === content_chunks.length
-          ? 'text-red'
-          : ''}">{chunk}</span
-      >
-    {/each}
+    {#if content_chunks.length === 0}
+      <span class="outline-dashed outline-cyan text-cyan">&nbsp;</span>
+    {:else}
+      {#each content_chunks as chunk, index}
+        <span
+          class="hover:outline-dashed outline-cyan {index + 1 ===
+            content_chunks.length && chunk.length > 0
+            ? 'text-cyan outline-dashed'
+            : ''}">{chunk}</span
+        >
+      {/each}
+    {/if}
   </div>
 </div>
 

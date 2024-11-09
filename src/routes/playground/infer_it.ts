@@ -3,6 +3,7 @@ import { nodes, settings } from "./state.js"
 import { get, type Writable } from "svelte/store"
 import { on_output, on_output_chunk } from "./state.js"
 import type { Params } from "./types.js"
+import toast from "svelte-french-toast"
 
 export function get_api_client() {
   return new OpenAI({
@@ -40,17 +41,16 @@ export async function infer_it({
       params.prompt = the_prompt
     }
 
+    const out_id = await on_output({
+      thread_id,
+      src_id,
+      status,
+    })
+
     const stream = await api_client.completions.create({
       ...params,
       stop: [params.stop === "\\n" ? "\n" : ""],
       stream: true,
-    })
-
-    const out_id = await on_output({
-      thread_id,
-      src_id,
-      output: "",
-      type: "success",
     })
 
     if (!out_id) {
@@ -66,12 +66,7 @@ export async function infer_it({
       })
     }
   } catch (e) {
-    await on_output({
-      thread_id,
-      src_id,
-      output: e.message,
-      type: "error",
-    })
+    toast.error(e instanceof Error ? e.message : JSON.stringify(e))
 
     console.error(e)
   } finally {

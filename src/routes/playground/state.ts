@@ -12,22 +12,6 @@ export const settings = writable<Settings>({
   api_key: "",
 })
 
-function init_settings() {
-  if (!browser) {
-    return
-  }
-
-  const locals = localStorage.getItem("settings")
-
-  if (!locals) {
-    return
-  }
-
-  settings.set(JSON.parse(locals))
-}
-
-init_settings()
-
 export const nodes: Writable<Node[]> = writable([])
 export const edges: Writable<Edge[]> = writable([])
 
@@ -35,17 +19,54 @@ export const model_names = [
   "vicgalle/Roleplay-Llama-3-8B",
   "athirdpath/NSFW_DPO_Noromaid-7b",
 ]
+function init_from_local({
+  key,
+  the_store,
+}: {
+  key: string
+  the_store: Writable<unknown>
+}) {
+  if (!browser) {
+    return
+  }
+
+  const locals = localStorage.getItem(key)
+
+  if (!locals) {
+    return
+  }
+
+  the_store.set(JSON.parse(locals))
+}
+
+init_from_local({ key: "settings", the_store: settings })
+init_from_local({ key: "nodes", the_store: nodes })
+init_from_local({ key: "edges", the_store: edges })
+
+nodes.subscribe((the_nodes) => {
+  if (!browser) {
+    return
+  }
+
+  localStorage.setItem("nodes", JSON.stringify(the_nodes))
+})
+
+edges.subscribe((the_edges) => {
+  if (!browser) {
+    return
+  }
+
+  localStorage.setItem("edges", JSON.stringify(the_edges))
+})
 
 export async function on_output({
   thread_id,
   src_id,
-  output,
-  type,
+  status,
 }: {
   thread_id: string
   src_id: string
-  output: string
-  type: "error" | "success"
+  status: Writable<"idle" | "busy">
 }) {
   const next_bot_node_id = String(Date.now())
 
@@ -64,9 +85,9 @@ export async function on_output({
         thread_id: thread_id,
         src_id,
         id: next_bot_node_id,
-        type,
-        content: output,
+        content: "",
         content_chunks: [],
+        status,
       },
       position: {
         x: src_node.position.x + 50 * Math.random(),
@@ -129,6 +150,8 @@ export function add_node(data?: Record<string, unknown>) {
 
     return the_nodes
   })
+
+  return new_id
 }
 
 export function add_user_node({
