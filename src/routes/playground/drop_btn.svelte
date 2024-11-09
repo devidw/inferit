@@ -7,7 +7,7 @@
   <button
     type="button"
     onclick={drop_me}
-    class="bg-red-9 text-red-1 p0.5 rounded-full"
+    class="bg-red-9 text-red-1 p0.5 rounded-full text-xs"
     {disabled}
   >
     <div class="i-eva:close-outline"></div>

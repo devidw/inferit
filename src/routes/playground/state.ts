@@ -16,9 +16,11 @@ export const nodes: Writable<Node[]> = writable([])
 export const edges: Writable<Edge[]> = writable([])
 
 export const model_names = [
+  "Gemini Nano",
   "vicgalle/Roleplay-Llama-3-8B",
   "athirdpath/NSFW_DPO_Noromaid-7b",
 ]
+
 function init_from_local({
   key,
   the_store,
@@ -87,7 +89,7 @@ export async function on_output({
         id: next_bot_node_id,
         content: "",
         content_chunks: [],
-        status,
+        status: get(status),
       },
       position: {
         x: src_node.position.x + 50 * Math.random(),
@@ -116,17 +118,29 @@ export async function on_output({
   return next_bot_node_id
 }
 
-export function on_output_chunk({ id, text }: { id: string; text: string }) {
+export function on_output_chunk({
+  id,
+  status,
+  text,
+}: {
+  id: string
+  status: Writable<unknown>
+  text?: string
+}) {
   nodes.update((the_nodes) => {
     const node = the_nodes.find((node) => node.id === id)
 
     if (node) {
-      node.data.content += text
+      node.data.status = get(status)
 
-      if (!Array.isArray(node.data.content_chunks)) {
-        node.data.content_chunks = []
-      } else {
-        node.data.content_chunks = [...node.data.content_chunks, text]
+      if (text) {
+        node.data.content += text
+
+        if (!Array.isArray(node.data.content_chunks)) {
+          node.data.content_chunks = []
+        } else {
+          node.data.content_chunks = [...node.data.content_chunks, text]
+        }
       }
     }
 

@@ -26,7 +26,7 @@
 
   let params: Params = $state(
     data.params ?? {
-      model: "vicgalle/Roleplay-Llama-3-8B",
+      model: "Gemini Nano",
       prompt: "You are a friendly being.",
       max_tokens: 100,
       temperature: 1,
@@ -72,7 +72,7 @@
 </script>
 
 <div
-  class="box w-500px relative bg-stone-8 rounded-lg border-0.5 p2 text-xs
+  class="box w-500px relative bg-stone-8 rounded-lg border-.5 px4 py2
 font-mono text-stone-3 border-stone-5"
 >
   <DropBtn {drop_me} disabled={$status === "busy"} />
@@ -84,8 +84,8 @@ font-mono text-stone-3 border-stone-5"
     onclick={fork_me}
     aria-label="fork"
     disabled={$status === "busy"}
-    class="bg-stone-5 rounded-full absolute -bottom-8px -right-8px z-1
-    w-16px h-16px flex justify-center items-center"
+    class="bg-stone-6 rounded-full absolute top-16px -left-8px z-1
+    w-16px h-16px flex justify-center items-center text-xs"
   >
     <div class="i-eva:copy-outline"></div>
   </button>
@@ -96,23 +96,7 @@ font-mono text-stone-3 border-stone-5"
     {/each}
   </datalist>
 
-  <datalist id="card_list">
-    <option value="e62wjcfr0yoamky">Karen</option>
-  </datalist>
-
   <fieldset class="space-y-2" disabled={$status === "busy"}>
-    <label class="flex items-center space-x-2">
-      <span class="w-50px">Model</span>
-      <input
-        type="text"
-        placeholder="Model"
-        class="w-full"
-        bind:value={params.model}
-        list="model_list"
-        spellcheck="false"
-      />
-    </label>
-
     <textarea
       bind:value={params.prompt}
       placeholder="System Message"
@@ -125,15 +109,24 @@ font-mono text-stone-3 border-stone-5"
         autosize.update(textarea)
       }}
       rows="1"
-      onfocusout={(event) => {
-        event.target.style.height = "25px"
-      }}
     ></textarea>
 
-    <details>
+    <details class="space-y-2">
       <summary class="underline op-50"> Params </summary>
 
-      <div class="params grid grid-gap-2 grid-cols-2 mt2">
+      <label class="flex items-center space-x-2">
+        <span class="w-50px">Model</span>
+        <input
+          type="text"
+          placeholder="Model"
+          class="w-full"
+          bind:value={params.model}
+          list="model_list"
+          spellcheck="false"
+        />
+      </label>
+
+      <div class="params grid grid-gap-2 grid-cols-2">
         <label class="flex items-center space-x-2">
           <input
             type="number"
@@ -180,12 +173,15 @@ font-mono text-stone-3 border-stone-5"
     box-shadow: 0 0 100px rgba(255, 102, 0, 0.2);
   }
 
-  textarea,
   input {
     --at-apply: "border-0.5 border-stone-5 rounded px2 py1";
   }
 
   .params input {
     --at-apply: "w-70px";
+  }
+
+  details {
+    --at-apply: "text-xs";
   }
 </style>

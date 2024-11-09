@@ -4,6 +4,7 @@ import { get, type Writable } from "svelte/store"
 import { on_output, on_output_chunk } from "./state.js"
 import type { Params } from "./types.js"
 import toast from "svelte-french-toast"
+import { build_prompt } from "./prompts.js"
 
 export function get_api_client() {
   return new OpenAI({
@@ -17,13 +18,13 @@ export async function infer_it({
   thread_id,
   src_id,
   status,
-  the_prompt,
 }: {
   thread_id: string
   src_id: string
   status: Writable<"idle" | "busy">
-  the_prompt?: string
 }) {
+  let out_id: string | undefined = undefined
+
   try {
     status.set("busy")
 
@@ -35,35 +36,87 @@ export async function infer_it({
       return
     }
 
-    let params: Params = Object.assign({}, thread_node.data.params) as Params
+    const prompt_build = build_prompt({
+      node_id: src_id,
+    })
 
-    if (the_prompt) {
-      params.prompt = the_prompt
+    if (!prompt_build) {
+      return
     }
 
-    const out_id = await on_output({
+    let params: Params = Object.assign({}, thread_node.data.params) as Params
+
+    params.prompt = prompt_build.the_prompt
+
+    out_id = await on_output({
       thread_id,
       src_id,
       status,
-    })
-
-    const stream = await api_client.completions.create({
-      ...params,
-      stop: [params.stop === "\\n" ? "\n" : ""],
-      stream: true,
     })
 
     if (!out_id) {
       return
     }
 
-    for await (const chunk of stream) {
-      // console.info({ chunk })
+    if (params.model === "Gemini Nano") {
+      // const messages = [...prompt_build.messages]
 
-      on_output_chunk({
-        id: out_id,
-        text: chunk.choices[0].text,
+      // const sys_msg = messages.shift()!
+
+      const local_llm = await window.ai.languageModel.create({
+        temperature: params.temperature,
+        topK: params.top_k,
+        // systemPrompt: sys_msg.content,
       })
+
+      // console.info({
+      //   sys_msg,
+      //   messages,
+      // })
+
+      const stream = local_llm.promptStreaming(
+        // @ts-ignore
+        // messages.map((msg) => {
+        //   return {
+        //     role: msg.role === "bot" ? "assistant" : "user",
+        //     content: msg.content,
+        //   }
+        // }),
+        params.prompt,
+        {}
+      )
+
+      let previous = ""
+
+      for await (const chunk of stream) {
+        let only_chunk = chunk.replace(previous, "")
+
+        on_output_chunk({
+          id: out_id,
+          status,
+          text: only_chunk,
+        })
+
+        previous = chunk
+      }
+
+      local_llm.destroy()
+    } else {
+      const stream = await api_client.completions.create({
+        ...params,
+        stop: [params.stop === "\\n" ? "\n" : ""],
+        stream: true,
+      })
+
+      for await (const chunk of stream) {
+        // console.info({ chunk })
+
+        on_output_chunk({
+          id: out_id,
+          status,
+          text: chunk.choices[0].text,
+        })
+      }
     }
   } catch (e) {
     toast.error(e instanceof Error ? e.message : JSON.stringify(e))
@@ -71,5 +124,12 @@ export async function infer_it({
     console.error(e)
   } finally {
     status.set("idle")
+
+    if (out_id) {
+      on_output_chunk({
+        id: out_id,
+        status,
+      })
+    }
   }
 }

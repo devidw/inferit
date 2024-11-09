@@ -7,7 +7,7 @@
   import { writable } from "svelte/store"
   import autosize from "svelte-autosize"
   import { get_token_count } from "./tokens.js"
-  import { build_prompt } from "./prompts.js"
+  import { onMount } from "svelte"
 
   let {
     data,
@@ -21,7 +21,7 @@
 
   const status = writable<"idle" | "busy">("idle")
 
-  let content = $state("some new user message")
+  let content = $state("")
   let token_count = $derived(get_token_count(content))
 
   $effect(() => {
@@ -31,9 +31,8 @@
       return
     }
 
+    // save
     me.data.content = content
-
-    // console.info({ content })
   })
 
   function drop_me() {
@@ -41,31 +40,29 @@
   }
 
   async function on_next() {
-    const src_node = $nodes.find((node) => node.id === data.src_id)
-
-    if (!src_node) {
-      return
-    }
-
-    const thread_prompt = build_prompt({
-      node_id: data.id,
-    })
-
-    if (!thread_prompt) {
-      return
-    }
-
     await infer_it({
       thread_id: data.thread_id,
       src_id: data.id,
       status,
-      the_prompt: thread_prompt,
     })
   }
+
+  onMount(() => {
+    const me = $nodes.find((node) => node.id === data.id)
+
+    if (!me) {
+      return
+    }
+
+    // restore
+    if (me.data.content && content.length === 0) {
+      content = me.data.content as string
+    }
+  })
 </script>
 
 <div
-  class="box relative bg-stone-8 border-0.5 font-mono text-xs p2
+  class="box relative bg-stone-8 border-0.5 font-mono px4 py2
   rounded-lg text-stone-3 border-stone-5"
 >
   <!-- <div>user {data.id}</div> -->
@@ -77,7 +74,7 @@
 
   <NextBtn func={on_next} />
 
-  <div class="absolute right-2 bottom-2 op50">
+  <div class="absolute right-2 bottom-2 op50 text-xs">
     {token_count}
   </div>
 

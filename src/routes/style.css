@@ -11,3 +11,26 @@ textarea {
 ::selection {
   --at-apply: "bg-cyan-6";
 }
+
+.markdown-body,
+textarea {
+  font-family: "Alegreya Variable" !important;
+}
+
+.markdown-body {
+  background-color: unset !important;
+  /* font-size: unset !important; */
+  /* font-family: unset !important; */
+  color: unset !important;
+}
+
+.markdown-body pre {
+  --at-apply: "bg-black! text-stone-3! rounded-0! -mx4";
+}
+.markdown-body pre code {
+  --at-apply: "text-xs!";
+}
+
+li {
+  list-style-type: "- ";
+}

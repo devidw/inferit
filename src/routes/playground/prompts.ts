@@ -89,5 +89,8 @@ export function build_prompt({ node_id }: { node_id: string }) {
   //   the_prompt,
   // })
 
-  return the_prompt
+  return {
+    messages,
+    the_prompt,
+  }
 }
