@@ -1,6 +1,8 @@
 import { get, type Writable, writable } from "svelte/store"
 import { type Edge, type Node } from "@xyflow/svelte"
 import { browser } from "$app/environment"
+import { tick } from "svelte"
+import type { HTMLTextareaAttributes } from "svelte/elements"
 
 type Settings = {
   base_url: string
@@ -58,7 +60,15 @@ edges.subscribe((the_edges) => {
     return
   }
 
-  localStorage.setItem("edges", JSON.stringify(the_edges))
+  // todo: drop edges when nodes are dropped and this logic will become obsolete
+  const nodes_snapshot = get(nodes)
+  const node_ids = nodes_snapshot.map((node) => node.id)
+
+  const filtered = the_edges.filter((edge) => {
+    return node_ids.includes(edge.source) && node_ids.includes(edge.target)
+  })
+
+  localStorage.setItem("edges", JSON.stringify(filtered))
 })
 
 export async function on_output({
@@ -168,7 +178,7 @@ export function add_node(data?: Record<string, unknown>) {
   return new_id
 }
 
-export function add_user_node({
+export async function add_user_node({
   thread_id,
   src_id,
   id,
@@ -220,5 +230,22 @@ export function add_user_node({
     })
 
     return the_edges
+  })
+
+  await tick()
+
+  const latest_input: HTMLTextAreaElement | null = document.querySelector(
+    // `textarea`
+    `div[data-id="${next_user_node_id}"] textarea`
+  )
+
+  console.info({ latest_input })
+
+  setTimeout(() => {
+    if (!latest_input) {
+      return
+    }
+
+    latest_input.focus()
   })
 }

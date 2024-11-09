@@ -25,7 +25,7 @@ textarea {
 }
 
 .markdown-body pre {
-  --at-apply: "bg-black! text-stone-3! rounded-0! -mx4";
+  --at-apply: "bg-black! text-stone-3! rounded-0! -mx2";
 }
 .markdown-body pre code {
   --at-apply: "text-xs!";

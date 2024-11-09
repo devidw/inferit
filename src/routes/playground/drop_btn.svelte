@@ -3,13 +3,11 @@
     $props()
 </script>
 
-<div class="absolute -top-2 -left-2">
-  <button
-    type="button"
-    onclick={drop_me}
-    class="bg-red-9 text-red-1 p0.5 rounded-full text-xs"
-    {disabled}
-  >
-    <div class="i-eva:close-outline"></div>
-  </button>
-</div>
+<button
+  type="button"
+  onclick={drop_me}
+  class="bg-red-9 text-red-1 p0.5 rounded-full text-xs absolute -left-8px -top-8px"
+  {disabled}
+>
+  <div class="i-eva:close-outline"></div>
+</button>

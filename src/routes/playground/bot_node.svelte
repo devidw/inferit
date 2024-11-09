@@ -53,7 +53,7 @@
 </script>
 
 <div
-  class="box relative bg-stone-9 border-1 border-dashed font-mono text-xs px4 py2
+  class="box relative bg-stone-9 border-1 border-dashed font-mono text-xs p2
 rounded-lg text-stone-3 {status === 'busy' ? 'border-cyan' : 'border-stone-6'}"
 >
   <!-- <div>bot {data.id}</div> -->
@@ -71,8 +71,8 @@ rounded-lg text-stone-3 {status === 'busy' ? 'border-cyan' : 'border-stone-6'}"
       md_render = !md_render
     }}
     aria-label="fork"
-    class="bg-stone-6 rounded-full absolute top-14px -left-8px z-1
-  w-16px h-16px flex justify-center items-center text-xs rotate-90"
+    class="bg-stone-6 rounded-full absolute -top-8px left-14px z-1
+  w-16px h-16px flex justify-center items-center text-xs"
   >
     {#if md_render}
       <div class="i-eva:toggle-right-outline"></div>

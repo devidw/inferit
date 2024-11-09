@@ -21,18 +21,29 @@
 
   const status = writable<"idle" | "busy">("idle")
 
+  let textarea_el: HTMLTextAreaElement | null = null
   let content = $state("")
   let token_count = $derived(get_token_count(content))
 
   $effect(() => {
-    const me = $nodes.find((node) => node.id === data.id)
-
-    if (!me) {
+    if (content.length === 0) {
       return
     }
 
-    // save
-    me.data.content = content
+    nodes.update((the_nodes) => {
+      const me = the_nodes.find((node) => node.id === data.id)
+
+      if (!me) {
+        return the_nodes
+      }
+
+      // save
+      me.data.content = content
+
+      return the_nodes
+    })
+
+    // console.info({ content })
   })
 
   function drop_me() {
@@ -45,6 +56,16 @@
       src_id: data.id,
       status,
     })
+  }
+
+  function on_key(e: KeyboardEvent) {
+    if (e.code !== "Enter" || e.shiftKey) {
+      return
+    }
+
+    e.preventDefault()
+
+    on_next()
   }
 
   onMount(() => {
@@ -62,7 +83,7 @@
 </script>
 
 <div
-  class="box relative bg-stone-8 border-0.5 font-mono px4 py2
+  class="box relative bg-stone-8 border-0.5 font-mono p2
   rounded-lg text-stone-3 border-stone-5"
 >
   <!-- <div>user {data.id}</div> -->
@@ -85,6 +106,8 @@
     spellcheck="false"
     rows="1"
     placeholder="User Message"
+    bind:this={textarea_el}
+    onkeydown={on_key}
   ></textarea>
 </div>
 
