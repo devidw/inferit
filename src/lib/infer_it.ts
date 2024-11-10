@@ -1,5 +1,5 @@
 import { OpenAI } from "openai"
-import { nodes, settings } from "./state.js"
+import { nodes, settings, is_online } from "./state.js"
 import { get, type Writable } from "svelte/store"
 import { on_output, on_output_chunk } from "./state.js"
 import type { Params } from "./types.js"
@@ -27,8 +27,6 @@ export async function infer_it({
 
   try {
     status.set("busy")
-
-    const api_client = get_api_client()
 
     const thread_node = get(nodes).find((node) => node.id === thread_id)
 
@@ -58,7 +56,14 @@ export async function infer_it({
       return
     }
 
-    if (params.model === "Gemini Nano") {
+    if (
+      params.model === "Gemini Nano" ||
+      (!navigator.onLine && get(settings).browser_ai_offline_fallback)
+    ) {
+      if (!window.ai.languageModel) {
+        throw new Error("browser ai not available")
+      }
+
       // const messages = [...prompt_build.messages]
 
       // const sys_msg = messages.shift()!
@@ -102,6 +107,8 @@ export async function infer_it({
 
       local_llm.destroy()
     } else {
+      const api_client = get_api_client()
+
       const stream = await api_client.completions.create({
         ...params,
         stop: [params.stop === "\\n" ? "\n" : ""],

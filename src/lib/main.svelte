@@ -6,12 +6,13 @@
     BackgroundVariant,
   } from "@xyflow/svelte"
   import "@xyflow/svelte/dist/style.css"
-  import { ControlButton, type NodeTypes, useSvelteFlow } from "@xyflow/svelte"
+  import { ControlButton, type NodeTypes } from "@xyflow/svelte"
   import Infer from "./system_node.svelte"
   import { nodes, edges, add_node } from "./state.js"
   import BotNode from "./bot_node.svelte"
   import UserNode from "./user_node.svelte"
   import Settings from "./settings.svelte"
+  import Online from "./online.svelte"
 
   const node_types: NodeTypes = {
     "custom-system-node": Infer,
@@ -51,3 +52,5 @@
     <Background variant={BackgroundVariant.Dots} />
   </SvelteFlow>
 </div>
+
+<Online />

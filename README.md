@@ -11,7 +11,7 @@ this with its UI that allows for an unlimited number of side-by-side
 generations. This makes it a perfect fit to compare and experiment with
 different models, prompts and sampler settings.
 
-![](./screen.webp)
+![](./screens/screen_24-11-09.png)
 
 Some example use cases:
 

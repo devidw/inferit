@@ -2,14 +2,25 @@ import { get, type Writable, writable } from "svelte/store"
 import { type Edge, type Node } from "@xyflow/svelte"
 import { tick } from "svelte"
 
+export const is_online = writable(navigator.onLine)
+
+function on_net_change() {
+  is_online.set(navigator.onLine)
+}
+
+window.addEventListener("online", on_net_change)
+window.addEventListener("offline", on_net_change)
+
 type Settings = {
   base_url: string
   api_key: string
+  browser_ai_offline_fallback: boolean
 }
 
 export const settings = writable<Settings>({
   base_url: "",
   api_key: "",
+  browser_ai_offline_fallback: true,
 })
 
 export const nodes: Writable<Node[]> = writable([])
@@ -36,6 +47,10 @@ function init_from_local({
 init_from_local({ key: "settings", the_store: settings })
 init_from_local({ key: "nodes", the_store: nodes })
 init_from_local({ key: "edges", the_store: edges })
+
+settings.subscribe((the_settings) => {
+  localStorage.setItem("settings", JSON.stringify(the_settings))
+})
 
 nodes.subscribe((the_nodes) => {
   localStorage.setItem("nodes", JSON.stringify(the_nodes))

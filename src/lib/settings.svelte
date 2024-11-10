@@ -1,7 +1,5 @@
 <script lang="ts">
-  import DropBtn from "./drop_btn.svelte"
   import { settings } from "./state.js"
-  import autosize from "svelte-autosize"
 
   let {
     close_it,
@@ -9,89 +7,89 @@
     close_it: () => void
   } = $props()
 
-  function on_submit(submit_mevent: SubmitEvent) {
-    submit_mevent.preventDefault()
-    localStorage.setItem("settings", JSON.stringify($settings))
-    close_it()
+  function on_win_key(e: KeyboardEvent) {
+    if (e.key === "Escape") {
+      close_it()
+    }
   }
 </script>
 
-<form
-  onsubmit={on_submit}
-  class="fixed bottom-35 left-50 z-1 bg-black rounded-4 w-120 font-mono
-text-stone-3 border-0.5 border-stone-5"
+<svelte:window onkeydown={on_win_key} />
+
+<div
+  class="fixed left-20 top-10 bottom-10 z-1 bg-black rounded-4 font-mono
+text-stone-3 border-0.5 border-stone-5 overflow-y-auto px4 pb2 max-w-2xl"
 >
-  <div class="relative p-4">
-    <DropBtn drop_me={close_it} />
+  <div
+    class="sticky top-0 flex justify-between mb1 backdrop-blur pt2 pb1 text-xs"
+  >
+    <button type="button" class="op70" onclick={close_it}>Close [ESC]</button>
+  </div>
 
-    <div class="space-y-2">
-      <label>
-        <span> API Base URL </span>
-        <input
-          type="url"
-          bind:value={$settings.base_url}
-          placeholder="Base URL"
-        />
-      </label>
+  <div class="space-y-2">
+    <label>
+      <span> API Base URL </span>
+      <input
+        type="url"
+        bind:value={$settings.base_url}
+        placeholder="Base URL"
+      />
+    </label>
 
-      <label>
-        <span>API Key</span>
-        <input
-          type="password"
-          bind:value={$settings.api_key}
-          placeholder="API Key"
-        />
-      </label>
+    <label>
+      <span>API Key</span>
+      <input
+        type="password"
+        bind:value={$settings.api_key}
+        placeholder="API Key"
+      />
+    </label>
 
-      <div class="text-end">
-        <button type="submit" class="underline">Save</button>
-      </div>
+    <div class="info">
+      <p>
+        This is saved on your device only. Inference-calls are made from your
+        device only.
+      </p>
 
-      <div class="text-xs text-stone-4">
-        <p>
-          This is saved on your device only. Inference-calls are made from your
-          device only.
-        </p>
+      <p>You can use any OpenAI-compatible API.</p>
+    </div>
 
-        <p>You can use any OpenAI-compatible API.</p>
+    <div class="py2"></div>
 
-        <p>Example Backends:</p>
+    <label class="flex! space-x-2">
+      <input
+        type="checkbox"
+        bind:checked={$settings.browser_ai_offline_fallback}
+        class="w-auto!"
+      />
+      <span>Fall back to browser built-in llm when offline (Gemini Nano)</span>
+    </label>
 
-        <ul>
-          <li>
-            <a
-              href="https://openrouter.ai"
-              target="_blank"
-              rel="noopener nofollow"
-            >
-              openrouter.ai
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://featherless.ai/register?referrer=C-Sikokn"
-              target="_blank"
-              rel="noopener nofollow"
-            >
-              featherless.ai
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://infermatic.ai"
-              target="_blank"
-              rel="noopener nofollow"
-            >
-              infermatic.ai
-            </a>
-          </li>
-        </ul>
-      </div>
+    <div class="info">
+      <p>
+        Chromium browsers only. You have to opt in to the preview and local
+        models have to be properly downloaded by the browser.
+        <a
+          target="_blank"
+          rel="noopener nofollow"
+          href="https://docs.google.com/document/d/1VG8HIyz361zGduWgNG7R_R8Xkv0OOJ8b5C9QKeCjU0c/edit?tab=t.0#heading=h.witohboigk0o"
+          >Setup guide</a
+        >
+      </p>
+
+      <p>
+        You might want to disable this, if you want to use a local backend when
+        you are offline.
+      </p>
     </div>
   </div>
-</form>
+</div>
 
 <style>
+  .info {
+    --at-apply: "text-xs text-stone-4 columns-2";
+  }
+
   input {
     --at-apply: "w-full border-0.5 border-stone-5 rounded px3 py1";
   }

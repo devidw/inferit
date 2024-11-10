@@ -1,7 +1,8 @@
 {
-    "name": "inferit",
-    "version": "1",
     "manifest_version": 3,
+    "version": "1",
+    "name": "inferit",
+    "description": "Visual inference exploration playground.",
     "chrome_url_overrides": {
         "newtab": "index.html"
     },
