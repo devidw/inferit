@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="./static/inferit.jpeg" alt="inferit" width="100px" />
+    <img src="./public/icon_32.png" alt="inferit" />
     <br />
     inferit
 </h1>
@@ -13,11 +13,16 @@ different models, prompts and sampler settings.
 
 ![](./screen.webp)
 
-Use cases:
+Some example use cases:
 
 - model exploration and comparison
 - prompt engineering
 - sampler setting optimizations
+
+Supported Backends:
+
+- Any local or remote backend that is compatible with the OpenAI API
+- [Chrome built-in AI](https://developer.chrome.com/docs/ai/built-in) (Gemini Nano)
 
 ## run it
 

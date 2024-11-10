@@ -6,16 +6,12 @@
   import "@fontsource-variable/alegreya"
   import "@fontsource-variable/alegreya/wght-italic.css"
   import { Toaster } from "svelte-french-toast"
+  import Main from "./lib/main.svelte"
 </script>
 
 <Toaster position="bottom-center" />
 
-<slot />
+<Main />
 
 <style>
-  :global(body) {
-    background: black;
-    color: white;
-    hyphens: auto;
-  }
 </style>

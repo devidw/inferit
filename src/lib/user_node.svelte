@@ -101,7 +101,7 @@
 
   <textarea
     bind:value={content}
-    class="w-300px pr4"
+    class="w-300px pr4 italic"
     use:autosize
     spellcheck="false"
     rows="1"

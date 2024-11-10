@@ -1,4 +1,4 @@
-import { sveltekit } from "@sveltejs/kit/vite"
+import { svelte } from "@sveltejs/vite-plugin-svelte"
 import { defineConfig } from "vite"
 import unocss from "unocss/vite"
 import transformerDirectives from "@unocss/transformer-directives"
@@ -8,8 +8,9 @@ import wasm_thing from "vite-plugin-wasm"
 import top_level_await from "vite-plugin-top-level-await"
 
 export default defineConfig({
+  base: "",
   plugins: [
-    sveltekit(),
+    svelte(),
     unocss({
       presets: [preset_default(), preset_icons()],
       transformers: [transformerDirectives()],

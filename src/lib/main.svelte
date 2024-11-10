@@ -26,10 +26,6 @@
   }
 </script>
 
-<svelte:head>
-  <title>Playground</title>
-</svelte:head>
-
 <div class="h-screen w-full absolute top-0">
   {#if show_settings}
     <Settings close_it={toggle_settings} />

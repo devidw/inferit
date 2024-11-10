@@ -1,8 +1,6 @@
 import { get, type Writable, writable } from "svelte/store"
 import { type Edge, type Node } from "@xyflow/svelte"
-import { browser } from "$app/environment"
 import { tick } from "svelte"
-import type { HTMLTextareaAttributes } from "svelte/elements"
 
 type Settings = {
   base_url: string
@@ -17,11 +15,7 @@ export const settings = writable<Settings>({
 export const nodes: Writable<Node[]> = writable([])
 export const edges: Writable<Edge[]> = writable([])
 
-export const model_names = [
-  "Gemini Nano",
-  "vicgalle/Roleplay-Llama-3-8B",
-  "athirdpath/NSFW_DPO_Noromaid-7b",
-]
+export const model_names = ["Gemini Nano"]
 
 function init_from_local({
   key,
@@ -30,10 +24,6 @@ function init_from_local({
   key: string
   the_store: Writable<unknown>
 }) {
-  if (!browser) {
-    return
-  }
-
   const locals = localStorage.getItem(key)
 
   if (!locals) {
@@ -48,18 +38,10 @@ init_from_local({ key: "nodes", the_store: nodes })
 init_from_local({ key: "edges", the_store: edges })
 
 nodes.subscribe((the_nodes) => {
-  if (!browser) {
-    return
-  }
-
   localStorage.setItem("nodes", JSON.stringify(the_nodes))
 })
 
 edges.subscribe((the_edges) => {
-  if (!browser) {
-    return
-  }
-
   // todo: drop edges when nodes are dropped and this logic will become obsolete
   const nodes_snapshot = get(nodes)
   const node_ids = nodes_snapshot.map((node) => node.id)
