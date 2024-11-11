@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
+    "start": "node ./server.js"
   },
   "devDependencies": {
     "@fontsource-variable/alegreya": "^5.1.1",
@@ -19,6 +20,7 @@
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@tsconfig/svelte": "^5.0.4",
     "@types/dom-chromium-ai": "^0.0.2",
+    "@types/express": "^5.0.0",
     "@unocss/reset": "^0.63.6",
     "@unocss/transformer-directives": "^0.63.6",
     "@xyflow/svelte": "^0.1.23",
@@ -41,5 +43,8 @@
     "vite-plugin-top-level-await": "^1.4.4",
     "vite-plugin-wasm": "^3.3.0"
   },
-  "packageManager": "pnpm@7.29.1+sha512.767fbae41d97a4c2229fbb1066f048276672c7c67b2caf79ab202f8043c4f2a5e45982ff2eec297cc7caf4cb9cefeccd9e93f089082d184b3180eb6e69b1626d"
+  "packageManager": "pnpm@7.29.1+sha512.767fbae41d97a4c2229fbb1066f048276672c7c67b2caf79ab202f8043c4f2a5e45982ff2eec297cc7caf4cb9cefeccd9e93f089082d184b3180eb6e69b1626d",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
 }
