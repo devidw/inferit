@@ -11,7 +11,7 @@ this with its UI that allows for an unlimited number of side-by-side
 generations. This makes it a perfect fit to compare and experiment with
 different models, prompts and sampler settings.
 
-![](./screens/screen_24-11-09.png)
+![](./screens/screen_24-11-11.png)
 
 Some example use cases:
 
@@ -22,15 +22,21 @@ Some example use cases:
 Supported Backends:
 
 - Any local or remote backend that is compatible with the OpenAI API
-- [Chrome built-in AI](https://developer.chrome.com/docs/ai/built-in) (Gemini Nano)
+- [Chrome's built-in llm](https://developer.chrome.com/docs/ai/built-in) (Gemini Nano)
 
 ## run it
 
-```bash
-pnpm install
-pnpm build
-pnpm preview
-```
+1. I've deployed an instance for instant access here: https://inferit.index.garden (online)
+2. Same code also ships as browser extension to run local and offline w/o having to start a process:
+   https://chromewebstore.google.com/detail/inferit/celkhcifjknihgjlieolcmchofdloagk
+3. Run it locally from this repo:
+   ```bash
+   pnpm install
+   pnpm build
+   pnpm preview
+   ```
+
+once running, set your api creds in the settings (stored on your device, [window.localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)) and u are good to go
 
 ## development
 
@@ -38,4 +44,8 @@ pnpm preview
 pnpm dev
 ```
 
-Contributions of any kind are warmly welcomed!
+<p align=center>
+    Contributions of any kind are warmly welcomed!
+    <br>
+    &lt;3
+<p>
