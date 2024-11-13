@@ -27,6 +27,15 @@ text-stone-3 border-0.5 border-stone-5 overflow-y-auto px4 pb2 max-w-2xl"
   </div>
 
   <div class="space-y-2">
+    <div class="info">
+      <p>
+        This is saved on your device only. Inference-calls are made from your
+        device only.
+      </p>
+
+      <p>You can use any OpenAI-compatible API.</p>
+    </div>
+
     <label>
       <span> API Base URL </span>
       <input
@@ -45,22 +54,40 @@ text-stone-3 border-0.5 border-stone-5 overflow-y-auto px4 pb2 max-w-2xl"
       />
     </label>
 
-    <div class="info">
-      <p>
-        This is saved on your device only. Inference-calls are made from your
-        device only.
-      </p>
+    <div class="flex space-x-4">
+      <label class="one-line">
+        <input type="radio" value="chat" bind:group={$settings.endpoint} />
+        <span>Chat Endpoint</span>
+      </label>
 
-      <p>You can use any OpenAI-compatible API.</p>
+      <label class="one-line">
+        <input
+          type="radio"
+          value="completions"
+          bind:group={$settings.endpoint}
+        />
+        <span>Completions Endpoint</span>
+      </label>
     </div>
+
+    {#if $settings.endpoint === "completions"}
+      <label>
+        <span> User Prefix </span>
+        <input type="url" bind:value={$settings.user_prefix} />
+      </label>
+
+      <label>
+        <span> Bot Prefix </span>
+        <input type="url" bind:value={$settings.bot_prefix} />
+      </label>
+    {/if}
 
     <div class="py2"></div>
 
-    <label class="flex! space-x-2">
+    <label class="one-line">
       <input
         type="checkbox"
         bind:checked={$settings.browser_ai_offline_fallback}
-        class="w-auto!"
       />
       <span>Fall back to browser built-in llm when offline (Gemini Nano)</span>
     </label>
@@ -86,6 +113,14 @@ text-stone-3 border-0.5 border-stone-5 overflow-y-auto px4 pb2 max-w-2xl"
 </div>
 
 <style>
+  .one-line {
+    --at-apply: "flex! space-x-2";
+  }
+
+  .one-line input {
+    --at-apply: "w-auto!";
+  }
+
   .info {
     --at-apply: "text-xs text-stone-4 columns-2";
   }
@@ -94,18 +129,8 @@ text-stone-3 border-0.5 border-stone-5 overflow-y-auto px4 pb2 max-w-2xl"
     --at-apply: "w-full border-0.5 border-stone-5 rounded px3 py1";
   }
 
-  p + p,
-  p + ul {
+  p + p {
     --at-apply: "mt1";
-  }
-
-  li + li {
-    --at-apply: "mt0.5";
-  }
-
-  li {
-    list-style-type: "- ";
-    --at-apply: "ml4";
   }
 
   a {

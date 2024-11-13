@@ -8,7 +8,7 @@
   import "@xyflow/svelte/dist/style.css"
   import { ControlButton, type NodeTypes } from "@xyflow/svelte"
   import Infer from "./system_node.svelte"
-  import { nodes, edges, add_node } from "./state.js"
+  import { nodes, edges, add_system_node } from "./state.js"
   import BotNode from "./bot_node.svelte"
   import UserNode from "./user_node.svelte"
   import Settings from "./settings.svelte"
@@ -40,8 +40,13 @@
     fitView
     proOptions={{ hideAttribution: true }}
   >
-    <Controls showZoom={false} showLock={false} showFitView={true}>
-      <ControlButton onclick={() => add_node()}>
+    <Controls
+      showZoom={false}
+      showLock={false}
+      showFitView={true}
+      position={"top-left"}
+    >
+      <ControlButton onclick={() => add_system_node()}>
         <div class="i-eva:plus-outline"></div>
       </ControlButton>
       <ControlButton onclick={toggle_settings}>

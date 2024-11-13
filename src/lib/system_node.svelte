@@ -5,13 +5,14 @@
     edges,
     nodes,
     model_names,
-    add_node,
+    add_system_node,
     add_user_node,
   } from "./state.js"
   import DropBtn from "./drop_btn.svelte"
   import NextBtn from "./next_btn.svelte"
   import { writable } from "svelte/store"
-  import type { Params } from "./types.js"
+  import { default_params, type Params } from "./types.js"
+  import { infer_it } from "./infer_it.js"
 
   let {
     data,
@@ -24,19 +25,11 @@
 
   const status = writable<"idle" | "busy">("idle")
 
-  let params: Params = $state(
-    data.params ?? {
-      model: "Gemini Nano",
-      prompt: "You are a friendly being.",
-      max_tokens: 100,
-      temperature: 1,
-      top_p: 1,
-      top_k: 40,
-      stop: "\\n",
-      min_p: 0,
-    }
-  )
+  let show_params = $state(true)
   let textarea: HTMLTextAreaElement | null = $state(null)
+  let params: Params = $state(
+    Object.assign({}, data.params) ?? Object.assign({}, default_params)
+  )
 
   function drop_me() {
     const connected_ones = $edges.filter((edge) => edge.source === data.id)
@@ -45,9 +38,13 @@
   }
 
   function fork_me() {
-    add_node({ params: Object.assign({}, params) })
+    add_system_node({
+      params: Object.assign({}, params),
+    })
   }
 
+  // save params
+  // todo: i think we only need that once on mount since we store the reference, right?
   $effect(() => {
     const me = $nodes.find((node) => node.id === data.id)
 
@@ -60,7 +57,7 @@
 
   const { screenToFlowPosition } = useSvelteFlow()
 
-  async function on_submit(e: MouseEvent) {
+  async function on_next_user(e: MouseEvent) {
     add_user_node({
       thread_id: data.id,
       src_id: data.id,
@@ -70,7 +67,13 @@
     })
   }
 
-  let show_params = $state(false)
+  async function on_next_bot(e: MouseEvent) {
+    await infer_it({
+      thread_id: data.id,
+      src_id: data.id,
+      status,
+    })
+  }
 </script>
 
 <div
@@ -79,7 +82,18 @@ font-mono text-stone-3 border-stone-5"
 >
   <DropBtn {drop_me} disabled={$status === "busy"} />
 
-  <NextBtn func={on_submit} disabled={$status === "busy"} />
+  <NextBtn
+    func={on_next_user}
+    disabled={$status === "busy"}
+    classes="left-[calc(50%_-_8px_-_20px)]!"
+    icon="i-eva:arrow-ios-downward-outline"
+  />
+
+  <NextBtn
+    func={on_next_bot}
+    disabled={$status === "busy"}
+    classes="left-[calc(50%_-_8px_+_20px)]!"
+  />
 
   <button
     type="button"
@@ -203,7 +217,8 @@ font-mono text-stone-3 border-stone-5"
     ></textarea>
   </fieldset>
 
-  <Handle type="source" position={Position.Bottom} />
+  <!-- <Handle type="source" position={Position.Bottom} class="hidden" /> -->
+  <Handle type="source" position={Position.Bottom} class="sr-only" />
 </div>
 
 <style>

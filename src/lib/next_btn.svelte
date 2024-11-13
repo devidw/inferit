@@ -2,7 +2,14 @@
   let {
     func,
     disabled,
-  }: { func: (e: MouseEvent) => void; disabled?: boolean } = $props()
+    classes,
+    icon,
+  }: {
+    func: (e: MouseEvent) => void
+    disabled?: boolean
+    classes?: string
+    icon?: string
+  } = $props()
 </script>
 
 <button
@@ -11,7 +18,7 @@
   {disabled}
   onclick={func}
   class="bg-cyan-7 rounded-full absolute -bottom-8px z-1 left-[calc(50%_-_8px)]
-w-16px h-16px flex justify-center items-center text-xs"
+w-16px h-16px flex justify-center items-center text-xs {classes ?? ''}"
 >
-  <div class="i-eva:arrowhead-down-fill"></div>
+  <div class={icon ?? "i-eva:arrowhead-down-fill"}></div>
 </button>

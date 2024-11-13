@@ -1,6 +1,7 @@
 import { get } from "svelte/store"
-import { nodes } from "./state.js"
+import { nodes, settings } from "./state.js"
 import type { Node } from "@xyflow/svelte"
+import { default_params, type Params } from "./types.js"
 
 /**
  * - system node    data.params.prompt
@@ -39,26 +40,31 @@ export function build_prompt({ node_id }: { node_id: string }) {
 
   const messages: { role: "system" | "user" | "bot"; content: string }[] = []
 
+  let params: Params = Object.assign({}, default_params)
+
   for (const thread_node of thread_nodes) {
     switch (thread_node.type) {
       case "custom-system-node": {
+        params = thread_node.data.params as Params
+
         messages.push({
           role: "system",
-          content: thread_node.data.params.prompt,
+          content: params.prompt,
         })
+
         break
       }
       case "custom-user-node": {
         messages.push({
           role: "user",
-          content: thread_node.data.content,
+          content: thread_node.data.content as string,
         })
         break
       }
       case "custom-bot-node": {
         messages.push({
           role: "bot",
-          content: thread_node.data.content,
+          content: thread_node.data.content as string,
         })
         break
       }
@@ -68,21 +74,28 @@ export function build_prompt({ node_id }: { node_id: string }) {
     }
   }
 
+  const settings_snapshot = get(settings)
+
   const the_prompt =
     messages
       .reverse()
       .map((msg) => {
         switch (msg.role) {
           case "system": {
-            return msg.content
+            return `${msg.content}`
           }
-          case "user":
+          case "user": {
+            return `${settings_snapshot.user_prefix}${msg.content}`
+          }
           case "bot": {
-            return `${msg.role}: ${msg.content}`
+            return `${settings_snapshot.bot_prefix}${msg.content}`
           }
         }
       })
-      .join("\n") + "\nbot:"
+      .join("\n") +
+    (settings_snapshot.bot_prefix.length > 0
+      ? `\n${settings_snapshot.bot_prefix}`
+      : "")
 
   // console.info({
   //   thread_nodes,

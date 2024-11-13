@@ -1,6 +1,8 @@
 import { get, type Writable, writable } from "svelte/store"
 import { type Edge, type Node } from "@xyflow/svelte"
 import { tick } from "svelte"
+import toast from "svelte-french-toast"
+import { default_settings, type Settings } from "./types.js"
 
 export const is_online = writable(navigator.onLine)
 
@@ -11,17 +13,7 @@ function on_net_change() {
 window.addEventListener("online", on_net_change)
 window.addEventListener("offline", on_net_change)
 
-type Settings = {
-  base_url: string
-  api_key: string
-  browser_ai_offline_fallback: boolean
-}
-
-export const settings = writable<Settings>({
-  base_url: "",
-  api_key: "",
-  browser_ai_offline_fallback: true,
-})
+export const settings = writable<Settings>(Object.assign({}, default_settings))
 
 export const nodes: Writable<Node[]> = writable([])
 export const edges: Writable<Edge[]> = writable([])
@@ -31,9 +23,11 @@ export const model_names = ["Gemini Nano"]
 function init_from_local({
   key,
   the_store,
+  default_value,
 }: {
   key: string
   the_store: Writable<unknown>
+  default_value?: object
 }) {
   const locals = localStorage.getItem(key)
 
@@ -41,10 +35,28 @@ function init_from_local({
     return
   }
 
-  the_store.set(JSON.parse(locals))
+  try {
+    const read = JSON.parse(locals)
+
+    if (default_value) {
+      the_store.set({
+        ...(default_value ?? {}),
+        ...read,
+      })
+    } else {
+      the_store.set(read)
+    }
+  } catch (e) {
+    console.error(e)
+    toast.error(e instanceof Error ? e.message : "Error during state recovery")
+  }
 }
 
-init_from_local({ key: "settings", the_store: settings })
+init_from_local({
+  key: "settings",
+  the_store: settings,
+  default_value: default_settings,
+})
 init_from_local({ key: "nodes", the_store: nodes })
 init_from_local({ key: "edges", the_store: edges })
 
@@ -68,94 +80,7 @@ edges.subscribe((the_edges) => {
   localStorage.setItem("edges", JSON.stringify(filtered))
 })
 
-export async function on_output({
-  thread_id,
-  src_id,
-  status,
-}: {
-  thread_id: string
-  src_id: string
-  status: Writable<"idle" | "busy">
-}) {
-  const next_bot_node_id = String(Date.now())
-
-  const src_node = get(nodes).find((node) => node.id === src_id)
-  // console.info({ src_node })
-
-  if (!src_node) {
-    return
-  }
-
-  nodes.update((the_nodes) => {
-    const node: Node = {
-      id: next_bot_node_id,
-      type: "custom-bot-node",
-      data: {
-        thread_id: thread_id,
-        src_id,
-        id: next_bot_node_id,
-        content: "",
-        content_chunks: [],
-        status: get(status),
-      },
-      position: {
-        x: src_node.position.x + 50 * Math.random(),
-        y:
-          src_node.position.y +
-          (src_node.measured?.height ?? 0.1) +
-          50 * Math.random(),
-      },
-    }
-
-    the_nodes.push(node)
-
-    return the_nodes
-  })
-
-  edges.update((the_edges) => {
-    the_edges.push({
-      id: String(Math.random()),
-      source: src_id,
-      target: next_bot_node_id,
-    })
-
-    return the_edges
-  })
-
-  return next_bot_node_id
-}
-
-export function on_output_chunk({
-  id,
-  status,
-  text,
-}: {
-  id: string
-  status: Writable<unknown>
-  text?: string
-}) {
-  nodes.update((the_nodes) => {
-    const node = the_nodes.find((node) => node.id === id)
-
-    if (node) {
-      node.data.status = get(status)
-
-      if (text) {
-        node.data.content += text
-
-        if (!Array.isArray(node.data.content_chunks)) {
-          node.data.content_chunks = []
-        } else {
-          node.data.content_chunks = [...node.data.content_chunks, text]
-        }
-      }
-    }
-
-    return the_nodes
-  })
-}
-
-export function add_node(data?: Record<string, unknown>) {
+export function add_system_node(data?: Record<string, unknown>) {
   const new_id = String(Date.now())
 
   nodes.update((the_nodes) => {
@@ -236,7 +161,7 @@ export async function add_user_node({
     `div[data-id="${next_user_node_id}"] textarea`
   )
 
-  console.info({ latest_input })
+  // console.info({ latest_input })
 
   setTimeout(() => {
     if (!latest_input) {
