@@ -7,15 +7,16 @@
   } from "@xyflow/svelte"
   import "@xyflow/svelte/dist/style.css"
   import { ControlButton, type NodeTypes } from "@xyflow/svelte"
-  import Infer from "./system_node.svelte"
-  import { nodes, edges, add_system_node } from "./state.js"
+  import SystemNode from "./system_node.svelte"
+  import { nodes, edges } from "./state.js"
   import BotNode from "./bot_node.svelte"
   import UserNode from "./user_node.svelte"
   import Settings from "./settings.svelte"
   import Online from "./online.svelte"
+  import { add_system_node } from "./nodes.js"
 
   const node_types: NodeTypes = {
-    "custom-system-node": Infer,
+    "custom-system-node": SystemNode,
     "custom-bot-node": BotNode,
     "custom-user-node": UserNode,
   }
@@ -39,6 +40,7 @@
     nodeTypes={node_types}
     fitView
     proOptions={{ hideAttribution: true }}
+    zoomOnDoubleClick={false}
   >
     <Controls
       showZoom={false}

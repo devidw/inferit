@@ -1,8 +1,13 @@
 import { get, type Writable, writable } from "svelte/store"
 import { type Edge, type Node } from "@xyflow/svelte"
-import { tick } from "svelte"
 import toast from "svelte-french-toast"
-import { default_settings, type Settings } from "./types.js"
+import {
+  default_settings,
+  type Our_Node,
+  type Param_Key,
+  type Params,
+  type Settings,
+} from "./types.js"
 
 export const is_online = writable(navigator.onLine)
 
@@ -15,7 +20,7 @@ window.addEventListener("offline", on_net_change)
 
 export const settings = writable<Settings>(Object.assign({}, default_settings))
 
-export const nodes: Writable<Node[]> = writable([])
+export const nodes: Writable<Our_Node[]> = writable([])
 export const edges: Writable<Edge[]> = writable([])
 
 export const model_names = ["Gemini Nano"]
@@ -79,95 +84,3 @@ edges.subscribe((the_edges) => {
 
   localStorage.setItem("edges", JSON.stringify(filtered))
 })
-
-export function add_system_node(data?: Record<string, unknown>) {
-  const new_id = String(Date.now())
-
-  nodes.update((the_nodes) => {
-    the_nodes.push({
-      id: new_id,
-      type: "custom-system-node",
-      position: { x: 50 * Math.random(), y: 50 * Math.random() },
-      data: {
-        ...data,
-        id: new_id,
-      },
-    })
-
-    return the_nodes
-  })
-
-  return new_id
-}
-
-export async function add_user_node({
-  thread_id,
-  src_id,
-  id,
-  e,
-  cords_helper,
-}: {
-  thread_id: string
-  src_id: string
-  id: string
-  e: MouseEvent
-  cords_helper: (a: { x: number; y: number }) => { x: number; y: number }
-}) {
-  const out = cords_helper({
-    x: e.pageX,
-    y: e.pageY,
-  })
-
-  const src_node = get(nodes).find((node) => node.id === src_id)
-
-  if (!src_node) {
-    return
-  }
-
-  const next_user_node_id = String(Date.now())
-
-  nodes.update((the_nodes) => {
-    the_nodes.push({
-      id: next_user_node_id,
-      type: "custom-user-node",
-      position: {
-        x: src_node.position.x + 20,
-        y: out.y + 20,
-      },
-      data: {
-        thread_id: thread_id,
-        src_id: id,
-        id: next_user_node_id,
-      },
-    })
-
-    return the_nodes
-  })
-
-  edges.update((the_edges) => {
-    the_edges.push({
-      id: `${id}_${next_user_node_id}`,
-      source: id,
-      target: next_user_node_id,
-    })
-
-    return the_edges
-  })
-
-  await tick()
-
-  const latest_input: HTMLTextAreaElement | null = document.querySelector(
-    // `textarea`
-    `div[data-id="${next_user_node_id}"] textarea`
-  )
-
-  // console.info({ latest_input })
-
-  setTimeout(() => {
-    if (!latest_input) {
-      return
-    }
-
-    latest_input.focus()
-  })
-}

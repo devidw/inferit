@@ -18,7 +18,7 @@
 
 <div
   class="fixed left-20 top-10 bottom-10 z-1 bg-black rounded-4 font-mono
-text-stone-3 border-0.5 border-stone-5 overflow-y-auto px4 pb2 max-w-2xl"
+text-stone-3 border-0.5 border-stone-5 overflow-y-auto px4 pb2 max-w-70vw lg:max-w-2xl"
 >
   <div
     class="sticky top-0 flex justify-between mb1 backdrop-blur pt2 pb1 text-xs"

@@ -1,10 +1,11 @@
 <script lang="ts">
   import { Handle, Position, type Node } from "@xyflow/svelte"
-  import { nodes, edges, add_user_node } from "./state.js"
+  import { nodes, edges } from "./state.js"
   import DropBtn from "./drop_btn.svelte"
   import NextBtn from "./next_btn.svelte"
   import { useSvelteFlow } from "@xyflow/svelte"
   import Markdown from "svelte-markdown"
+  import { add_user_node } from "./nodes.js"
 
   let {
     data,

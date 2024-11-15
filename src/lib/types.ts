@@ -1,3 +1,14 @@
+import type { Node } from "@xyflow/svelte"
+
+export type Our_Node = Node<{
+  id?: string
+  thread_id?: string
+  src_id?: string
+  content?: string
+  params?: Params
+  param_syncs?: Param_Key[]
+}>
+
 export type Params = {
   prompt: string
   model: string
@@ -21,6 +32,14 @@ export const default_params: Params = {
 }
 
 Object.freeze(default_params)
+
+export type Param_Key = keyof Params
+
+export const default_param_syncs: Param_Key[] = Object.keys(
+  default_params
+) as Param_Key[]
+
+Object.freeze(default_param_syncs)
 
 export type Settings = {
   base_url: string

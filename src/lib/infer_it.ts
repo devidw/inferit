@@ -1,11 +1,10 @@
 import { OpenAI } from "openai"
 import { nodes, settings } from "./state.js"
 import { get, type Writable } from "svelte/store"
-import { edges } from "./state.js"
 import type { Params } from "./types.js"
 import toast from "svelte-french-toast"
 import { build_prompt } from "./prompts.js"
-import type { Node } from "@xyflow/svelte"
+import { add_bot_node, update_bot_node } from "./nodes.js"
 
 const role_map = {
   system: "system",
@@ -47,7 +46,7 @@ export async function infer_it({
 
     // delete (params as Params & { prompt?: string }).prompt
 
-    out_id = await on_output({
+    out_id = await add_bot_node({
       thread_id,
       src_id,
       status,
@@ -96,7 +95,7 @@ export async function infer_it({
       for await (const chunk of stream) {
         let only_chunk = chunk.replace(previous, "")
 
-        on_output_chunk({
+        update_bot_node({
           id: out_id,
           status,
           text: only_chunk,
@@ -123,7 +122,7 @@ export async function infer_it({
         for await (const chunk of stream) {
           // console.info({ chunk })
 
-          on_output_chunk({
+          update_bot_node({
             id: out_id,
             status,
             text: chunk.choices[0].text,
@@ -154,7 +153,7 @@ export async function infer_it({
             continue
           }
 
-          on_output_chunk({
+          update_bot_node({
             id: out_id,
             status,
             text,
@@ -170,97 +169,10 @@ export async function infer_it({
     status.set("idle")
 
     if (out_id) {
-      on_output_chunk({
+      update_bot_node({
         id: out_id,
         status,
       })
     }
   }
-}
-
-async function on_output({
-  thread_id,
-  src_id,
-  status,
-}: {
-  thread_id: string
-  src_id: string
-  status: Writable<"idle" | "busy">
-}) {
-  const next_bot_node_id = String(Date.now())
-
-  const src_node = get(nodes).find((node) => node.id === src_id)
-  // console.info({ src_node })
-
-  if (!src_node) {
-    return
-  }
-
-  nodes.update((the_nodes) => {
-    const node: Node = {
-      id: next_bot_node_id,
-      type: "custom-bot-node",
-      data: {
-        thread_id: thread_id,
-        src_id,
-        id: next_bot_node_id,
-        content: "",
-        content_chunks: [],
-        status: get(status),
-      },
-      position: {
-        x: src_node.position.x + 50 * Math.random(),
-        y:
-          src_node.position.y +
-          (src_node.measured?.height ?? 0.1) +
-          50 * Math.random(),
-      },
-    }
-
-    the_nodes.push(node)
-
-    return the_nodes
-  })
-
-  edges.update((the_edges) => {
-    the_edges.push({
-      id: String(Math.random()),
-      source: src_id,
-      target: next_bot_node_id,
-    })
-
-    return the_edges
-  })
-
-  return next_bot_node_id
-}
-
-function on_output_chunk({
-  id,
-  status,
-  text,
-}: {
-  id: string
-  status: Writable<unknown>
-  text?: string
-}) {
-  nodes.update((the_nodes) => {
-    const node = the_nodes.find((node) => node.id === id)
-
-    if (node) {
-      node.data.status = get(status)
-
-      if (text) {
-        node.data.content += text
-
-        if (!Array.isArray(node.data.content_chunks)) {
-          node.data.content_chunks = []
-        } else {
-          node.data.content_chunks = [...node.data.content_chunks, text]
-        }
-      }
-    }
-
-    return the_nodes
-  })
 }
