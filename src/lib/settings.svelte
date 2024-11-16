@@ -12,6 +12,22 @@
       close_it()
     }
   }
+
+  function add_backend() {
+    $settings.backends = [
+      ...$settings.backends,
+      {
+        base_url: "",
+        api_key: "",
+      },
+    ]
+  }
+
+  function drop_backend(index: number) {
+    $settings.backends = $settings.backends.filter(
+      (_, _index) => _index !== index
+    )
+  }
 </script>
 
 <svelte:window onkeydown={on_win_key} />
@@ -26,7 +42,7 @@ text-stone-3 border-0.5 border-stone-5 overflow-y-auto px4 pb2 max-w-70vw lg:max
     <button type="button" class="op70" onclick={close_it}>Close [ESC]</button>
   </div>
 
-  <div class="space-y-2">
+  <div class="">
     <div class="info">
       <p>
         This is saved on your device only. Inference-calls are made from your
@@ -36,23 +52,47 @@ text-stone-3 border-0.5 border-stone-5 overflow-y-auto px4 pb2 max-w-70vw lg:max
       <p>You can use any OpenAI-compatible API.</p>
     </div>
 
-    <label>
-      <span> API Base URL </span>
-      <input
-        type="url"
-        bind:value={$settings.base_url}
-        placeholder="Base URL"
-      />
-    </label>
+    <div class="mt2 space-y-4">
+      {#each $settings.backends as _, index}
+        <div
+          class="relative border-l border-t border-stone-7 border-dashed pl2 rounded-tl"
+        >
+          <button
+            class="absolute right-0 top-1 text-red-7"
+            type="button"
+            onclick={() => drop_backend(index)}
+          >
+            <div class="i-eva:close-outline"></div>
+          </button>
 
-    <label>
-      <span>API Key</span>
-      <input
-        type="password"
-        bind:value={$settings.api_key}
-        placeholder="API Key"
-      />
-    </label>
+          <label>
+            <span> API Base URL </span>
+            <input
+              type="url"
+              bind:value={$settings.backends[index].base_url}
+              placeholder="Base URL"
+            />
+          </label>
+
+          <label>
+            <span>API Key</span>
+            <input
+              type="password"
+              bind:value={$settings.backends[index].api_key}
+              placeholder="API Key"
+            />
+          </label>
+        </div>
+      {/each}
+    </div>
+
+    <div class="mt2 text-start">
+      <button type="button" onclick={add_backend} class="">
+        <div class="i-eva:plus-outline"></div>
+      </button>
+    </div>
+
+    <div class="my4 border-b border-stone-7 border-dashed"></div>
 
     <div class="flex space-x-4">
       <label class="one-line">
@@ -82,7 +122,7 @@ text-stone-3 border-0.5 border-stone-5 overflow-y-auto px4 pb2 max-w-70vw lg:max
       </label>
     {/if}
 
-    <div class="py2"></div>
+    <div class="my4 border-b border-stone-7 border-dashed"></div>
 
     <label class="one-line">
       <input

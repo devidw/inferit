@@ -1,11 +1,16 @@
 <script lang="ts">
   import { Handle, Position, useSvelteFlow } from "@xyflow/svelte"
   import autosize from "svelte-autosize"
-  import { edges, nodes, model_names } from "./state.js"
+  import { edges, nodes, settings } from "./state.js"
   import DropBtn from "./drop_btn.svelte"
   import NextBtn from "./next_btn.svelte"
   import { writable } from "svelte/store"
-  import { default_param_syncs, type Param_Key, type Params } from "./types.js"
+  import {
+    default_param_syncs,
+    type Param_Key,
+    type Params,
+    browser_backend_name,
+  } from "./types.js"
   import { infer_it } from "./infer_it.js"
   import { untrack } from "svelte"
   import SyncControl from "./sync_control.svelte"
@@ -18,7 +23,6 @@
   }: {
     data: {
       id: string
-      params: Params
     }
   } = $props()
 
@@ -45,6 +49,14 @@
   }
 
   const params_proxy = {
+    get backend() {
+      return $nodes[index].data.params.backend
+    },
+    set backend(backend: string) {
+      $nodes[index].data.params.backend = backend
+      _params.backend = backend
+    },
+
     get model() {
       return $nodes[index].data.params.model
     },
@@ -117,6 +129,7 @@
 
     _param_syncs
 
+    _params.backend
     _params.prompt
     _params.model
     _params.max_tokens
@@ -257,30 +270,30 @@ font-mono text-stone-3 border-stone-5"
     <div class="i-eva:copy-outline"></div>
   </button>
 
-  <datalist id="model_list">
-    {#each model_names as one_model_name}
-      <option value={one_model_name}>{one_model_name}</option>
-    {/each}
-  </datalist>
-
   <fieldset class="space-y-2" disabled={$status === "busy"}>
     {#if show_params}
       <div class="text-xs space-y-2">
         <label class="flex items-center space-x-2">
+          <SyncControl value="backend" bind:group={param_syncs_proxy.value} />
+          <span class="w-50px">Backend</span>
+          <select bind:value={params_proxy.backend} class="w-full">
+            <option value={browser_backend_name}>{browser_backend_name}</option>
+            {#each $settings.backends as backend}
+              <option value={backend.base_url}>{backend.base_url}</option>
+            {/each}
+          </select>
+        </label>
+
+        <label class="flex items-center space-x-2">
           <SyncControl value="model" bind:group={param_syncs_proxy.value} />
-          <!-- <input
-            type="checkbox"
-            value="model"
-            bind:group={param_syncs_proxy.value}
-          /> -->
           <span class="w-50px">Model</span>
           <input
             type="text"
             placeholder="Model"
             class="w-full"
             bind:value={params_proxy.model}
-            list="model_list"
             spellcheck="false"
+            disabled={params_proxy.backend === browser_backend_name}
           />
         </label>
 
@@ -316,7 +329,7 @@ font-mono text-stone-3 border-stone-5"
               min="0"
               step="0.1"
               bind:value={params_proxy.min_p}
-              disabled={params_proxy.model === "Gemini Nano"}
+              disabled={params_proxy.backend === browser_backend_name}
             />
             <div class="">min_p</div>
           </label>
@@ -331,7 +344,7 @@ font-mono text-stone-3 border-stone-5"
             <input
               type="number"
               bind:value={params_proxy.top_p}
-              disabled={params_proxy.model === "Gemini Nano"}
+              disabled={params_proxy.backend === browser_backend_name}
             />
             <div class="">top_p</div>
           </label>
@@ -357,7 +370,7 @@ font-mono text-stone-3 border-stone-5"
             <input
               type="text"
               bind:value={params_proxy.stop}
-              disabled={params_proxy.model === "Gemini Nano"}
+              disabled={params_proxy.backend === browser_backend_name}
             />
             <div class="">stop</div>
           </label>
@@ -376,7 +389,7 @@ font-mono text-stone-3 border-stone-5"
               type="number"
               min="1"
               bind:value={params_proxy.max_tokens}
-              disabled={params_proxy.model === "Gemini Nano"}
+              disabled={params_proxy.backend === browser_backend_name}
             />
             <div class="">max_tokens</div>
           </label>
@@ -427,6 +440,7 @@ font-mono text-stone-3 border-stone-5"
     box-shadow: 0 0 100px rgba(255, 102, 0, 0.2);
   }
 
+  select,
   input {
     --at-apply: "border-0.5 border-stone-5 rounded px2 py1";
   }
@@ -435,7 +449,7 @@ font-mono text-stone-3 border-stone-5"
     --at-apply: "w-70px";
   }
 
-  .params input:disabled {
+  :disabled {
     --at-apply: "op50";
   }
 </style>

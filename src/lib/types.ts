@@ -10,18 +10,27 @@ export type Our_Node = Node<{
 }>
 
 export type Params = {
-  prompt: string
+  backend: string
+
   model: string
-  max_tokens: number
+
+  prompt: string
+
   temperature: number
+  min_p: number
+
   top_p: number
   top_k: number
+
   stop: string
-  min_p: number
+  max_tokens: number
 }
 
+export const browser_backend_name = "browser"
+
 export const default_params: Params = {
-  model: "Gemini Nano",
+  backend: browser_backend_name,
+  model: "",
   prompt: "You are a friendly being.",
   max_tokens: 100,
   temperature: 1,
@@ -42,8 +51,10 @@ export const default_param_syncs: Param_Key[] = Object.keys(
 Object.freeze(default_param_syncs)
 
 export type Settings = {
-  base_url: string
-  api_key: string
+  backends: {
+    base_url: string
+    api_key: string
+  }[]
   endpoint: "chat" | "completions"
   user_prefix: string
   bot_prefix: string
@@ -51,8 +62,7 @@ export type Settings = {
 }
 
 export const default_settings: Settings = {
-  base_url: "",
-  api_key: "",
+  backends: [],
   browser_ai_offline_fallback: true,
   endpoint: "chat",
   user_prefix: "user: ",

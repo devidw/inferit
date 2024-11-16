@@ -1,13 +1,7 @@
 import { get, type Writable, writable } from "svelte/store"
-import { type Edge, type Node } from "@xyflow/svelte"
+import { type Edge } from "@xyflow/svelte"
 import toast from "svelte-french-toast"
-import {
-  default_settings,
-  type Our_Node,
-  type Param_Key,
-  type Params,
-  type Settings,
-} from "./types.js"
+import { default_settings, type Our_Node, type Settings } from "./types.js"
 
 export const is_online = writable(navigator.onLine)
 
@@ -22,8 +16,6 @@ export const settings = writable<Settings>(Object.assign({}, default_settings))
 
 export const nodes: Writable<Our_Node[]> = writable([])
 export const edges: Writable<Edge[]> = writable([])
-
-export const model_names = ["Gemini Nano"]
 
 function init_from_local({
   key,

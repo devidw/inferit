@@ -64,7 +64,7 @@ rounded-lg text-stone-3 {status === 'busy' ? 'border-cyan' : 'border-stone-6'}"
 
   <DropBtn {drop_me} />
 
-  <NextBtn func={on_next} />
+  <NextBtn func={on_next} icon="i-eva:arrow-ios-downward-outline" />
 
   <button
     type="button"

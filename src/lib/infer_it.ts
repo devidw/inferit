@@ -1,7 +1,7 @@
 import { OpenAI } from "openai"
 import { nodes, settings } from "./state.js"
 import { get, type Writable } from "svelte/store"
-import type { Params } from "./types.js"
+import { browser_backend_name, type Params } from "./types.js"
 import toast from "svelte-french-toast"
 import { build_prompt } from "./prompts.js"
 import { add_bot_node, update_bot_node } from "./nodes.js"
@@ -57,7 +57,7 @@ export async function infer_it({
     }
 
     if (
-      params.model === "Gemini Nano" ||
+      params.backend === browser_backend_name ||
       (!navigator.onLine && settings_snapshot.browser_ai_offline_fallback)
     ) {
       if (!window.ai.languageModel) {
@@ -106,17 +106,48 @@ export async function infer_it({
 
       local_llm.destroy()
     } else {
+      const backend = settings_snapshot.backends.find(
+        (backend) => backend.base_url === params.backend
+      )
+
+      if (!backend) {
+        throw new Error(`backend '${params.backend}' not found in settings`)
+      }
+
       const api_client = new OpenAI({
-        baseURL: settings_snapshot.base_url,
-        apiKey: settings_snapshot.api_key,
+        baseURL: backend.base_url,
+        apiKey: backend.api_key,
         dangerouslyAllowBrowser: true,
+        defaultHeaders:
+          backend.base_url === "https://openrouter.ai/api/v1"
+            ? {
+                "http-referer": "https://inferit.index.garden",
+                "x-title": "inferit",
+              }
+            : {},
       })
 
       if (settings_snapshot.endpoint === "completions") {
         const stream = await api_client.completions.create({
-          ...params,
-          stop: [params.stop === "\\n" ? "\n" : ""],
           stream: true,
+
+          prompt: prompt_build.the_prompt,
+
+          model: params.model,
+
+          max_tokens: params.max_tokens,
+          stop:
+            params.stop === "\\n"
+              ? ["\n"]
+              : params.stop === ""
+                ? []
+                : [params.stop],
+
+          temperature: params.temperature,
+          min_p: params.min_p,
+
+          top_p: params.top_p,
+          top_k: params.top_k,
         })
 
         for await (const chunk of stream) {
@@ -132,9 +163,8 @@ export async function infer_it({
         delete (params as { prompt?: any }).prompt
 
         const stream = await api_client.chat.completions.create({
-          ...params,
-          stop: [params.stop === "\\n" ? "\n" : ""],
           stream: true,
+
           // @ts-ignore
           messages: prompt_build.messages.map((msg) => {
             return {
@@ -142,6 +172,22 @@ export async function infer_it({
               content: msg.content,
             }
           }),
+
+          model: params.model,
+
+          max_tokens: params.max_tokens,
+          stop:
+            params.stop === "\\n"
+              ? ["\n"]
+              : params.stop === ""
+                ? []
+                : [params.stop],
+
+          temperature: params.temperature,
+          min_p: params.min_p,
+
+          top_p: params.top_p,
+          top_k: params.top_k,
         })
 
         for await (const chunk of stream) {
