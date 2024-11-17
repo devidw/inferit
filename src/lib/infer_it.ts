@@ -1,5 +1,5 @@
 import { OpenAI } from "openai"
-import { nodes, settings } from "./state.js"
+import { abort_controller, nodes, settings } from "./state.js"
 import { get, type Writable } from "svelte/store"
 import { browser_backend_name, type Params } from "./types.js"
 import toast from "svelte-french-toast"
@@ -71,6 +71,7 @@ export async function infer_it({
       const local_llm = await window.ai.languageModel.create({
         temperature: params.temperature,
         topK: params.top_k,
+        signal: get(abort_controller).signal,
         // systemPrompt: sys_msg.content,
       })
 
@@ -128,27 +129,35 @@ export async function infer_it({
       })
 
       if (settings_snapshot.endpoint === "completions") {
-        const stream = await api_client.completions.create({
-          stream: true,
+        const stream = await api_client.completions.create(
+          {
+            stream: true,
+            // stream_options: {
+            //   include_usage: true,
+            // },
 
-          prompt: prompt_build.the_prompt,
+            prompt: prompt_build.the_prompt,
 
-          model: params.model,
+            model: params.model,
 
-          max_tokens: params.max_tokens,
-          stop:
-            params.stop === "\\n"
-              ? ["\n"]
-              : params.stop === ""
-                ? []
-                : [params.stop],
+            max_tokens: params.max_tokens,
+            stop:
+              params.stop === "\\n"
+                ? ["\n"]
+                : params.stop === ""
+                  ? []
+                  : [params.stop],
 
-          temperature: params.temperature,
-          min_p: params.min_p,
+            temperature: params.temperature,
+            min_p: params.min_p,
 
-          top_p: params.top_p,
-          top_k: params.top_k,
-        })
+            top_p: params.top_p,
+            top_k: params.top_k,
+          },
+          {
+            signal: get(abort_controller).signal,
+          }
+        )
 
         for await (const chunk of stream) {
           // console.info({ chunk })
@@ -162,33 +171,38 @@ export async function infer_it({
       } else if (settings_snapshot.endpoint === "chat") {
         delete (params as { prompt?: any }).prompt
 
-        const stream = await api_client.chat.completions.create({
-          stream: true,
+        const stream = await api_client.chat.completions.create(
+          {
+            stream: true,
 
-          // @ts-ignore
-          messages: prompt_build.messages.map((msg) => {
-            return {
-              role: role_map[msg.role],
-              content: msg.content,
-            }
-          }),
+            // @ts-ignore
+            messages: prompt_build.messages.map((msg) => {
+              return {
+                role: role_map[msg.role],
+                content: msg.content,
+              }
+            }),
 
-          model: params.model,
+            model: params.model,
 
-          max_tokens: params.max_tokens,
-          stop:
-            params.stop === "\\n"
-              ? ["\n"]
-              : params.stop === ""
-                ? []
-                : [params.stop],
+            max_tokens: params.max_tokens,
+            stop:
+              params.stop === "\\n"
+                ? ["\n"]
+                : params.stop === ""
+                  ? []
+                  : [params.stop],
 
-          temperature: params.temperature,
-          min_p: params.min_p,
+            temperature: params.temperature,
+            min_p: params.min_p,
 
-          top_p: params.top_p,
-          top_k: params.top_k,
-        })
+            top_p: params.top_p,
+            top_k: params.top_k,
+          },
+          {
+            signal: get(abort_controller).signal,
+          }
+        )
 
         for await (const chunk of stream) {
           // console.info({ chunk })

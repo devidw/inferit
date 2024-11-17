@@ -50,7 +50,7 @@
     $nodes = $nodes.filter((node) => node.id !== data.id)
   }
 
-  async function on_next() {
+  async function on_next_bot() {
     await infer_it({
       thread_id: data.thread_id,
       src_id: data.id,
@@ -65,7 +65,7 @@
 
     e.preventDefault()
 
-    on_next()
+    on_next_bot()
   }
 
   onMount(() => {
@@ -93,7 +93,7 @@
 
   <DropBtn {drop_me} />
 
-  <NextBtn func={on_next} />
+  <NextBtn func={on_next_bot} allow_abort {status} />
 
   <div class="absolute right-2 bottom-2 op50 text-xs">
     {token_count}

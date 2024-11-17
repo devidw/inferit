@@ -17,6 +17,8 @@ export const settings = writable<Settings>(Object.assign({}, default_settings))
 export const nodes: Writable<Our_Node[]> = writable([])
 export const edges: Writable<Edge[]> = writable([])
 
+export const abort_controller = writable(new AbortController())
+
 function init_from_local({
   key,
   the_store,

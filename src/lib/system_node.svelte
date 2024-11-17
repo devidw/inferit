@@ -231,15 +231,15 @@ font-mono text-stone-3 border-stone-5"
 
   <NextBtn
     func={on_next_user}
-    disabled={$status === "busy"}
     classes="left-[calc(50%_-_8px_-_20px)]!"
     icon="i-eva:arrow-ios-downward-outline"
   />
 
   <NextBtn
     func={on_next_bot}
-    disabled={$status === "busy"}
     classes="left-[calc(50%_-_8px_+_20px)]!"
+    allow_abort
+    {status}
   />
 
   <button
