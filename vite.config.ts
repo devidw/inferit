@@ -18,4 +18,17 @@ export default defineConfig({
     wasm_thing(),
     top_level_await(),
   ],
+  build: {
+    rollupOptions: {
+      input: {
+        main: "./index.html",
+        bg: "./src/bg.ts",
+      },
+      output: {
+        entryFileNames: `[name].js`,
+        chunkFileNames: `[name].js`,
+        assetFileNames: `assets/[name].[ext]`,
+      },
+    },
+  },
 })

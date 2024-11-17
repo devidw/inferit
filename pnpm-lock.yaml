@@ -9,6 +9,7 @@ specifiers:
   '@sveltejs/kit': ^2.0.0
   '@sveltejs/vite-plugin-svelte': ^4.0.0
   '@tsconfig/svelte': ^5.0.4
+  '@types/chrome': ^0.0.283
   '@types/dom-chromium-ai': ^0.0.2
   '@types/express': ^5.0.0
   '@unocss/reset': ^0.63.6
@@ -46,6 +47,7 @@ devDependencies:
   '@sveltejs/kit': 2.8.0_w6gobegzxphcvyx6s2v54tmh3a
   '@sveltejs/vite-plugin-svelte': 4.0.0_svelte@5.1.13+vite@5.4.10
   '@tsconfig/svelte': 5.0.4
+  '@types/chrome': 0.0.283
   '@types/dom-chromium-ai': 0.0.2
   '@types/express': 5.0.0
   '@unocss/reset': 0.63.6
@@ -1073,6 +1075,13 @@ packages:
       '@types/node': 18.19.64
     dev: true
 
+  /@types/chrome/0.0.283:
+    resolution: {integrity: sha512-bPnu1JqeQxMceRP0oxFYrauoe0BlWxxQxhYL58gWLg5Ywsd3i3Dd6By9OW7BdkNQMokodWzBLR5FHDIeQZvJWg==}
+    dependencies:
+      '@types/filesystem': 0.0.36
+      '@types/har-format': 1.2.16
+    dev: true
+
   /@types/connect/3.4.38:
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
     dependencies:
@@ -1140,6 +1149,20 @@ packages:
       '@types/express-serve-static-core': 5.0.1
       '@types/qs': 6.9.17
       '@types/serve-static': 1.15.7
+    dev: true
+
+  /@types/filesystem/0.0.36:
+    resolution: {integrity: sha512-vPDXOZuannb9FZdxgHnqSwAG/jvdGM8Wq+6N4D/d80z+D4HWH+bItqsZaVRQykAn6WEVeEkLm2oQigyHtgb0RA==}
+    dependencies:
+      '@types/filewriter': 0.0.33
+    dev: true
+
+  /@types/filewriter/0.0.33:
+    resolution: {integrity: sha512-xFU8ZXTw4gd358lb2jw25nxY9QAgqn2+bKKjKOYfNCzN4DKCFetK7sPtrlpg66Ywe3vWY9FNxprZawAh9wfJ3g==}
+    dev: true
+
+  /@types/har-format/1.2.16:
+    resolution: {integrity: sha512-fluxdy7ryD3MV6h8pTfTYpy/xQzCFC7m89nOH9y94cNqJ1mDIDPut7MnRHI3F6qRmh/cT2fUjG1MLdCNb4hE9A==}
     dev: true
 
   /@types/http-errors/2.0.4:

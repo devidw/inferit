@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "version": "1",
+    "version": "2",
     "name": "inferit",
-    "description": "Visual inference exploration playground.",
+    "description": "Visual inference exploration & experimentation playground",
     "chrome_url_overrides": {
         "newtab": "index.html"
     },
@@ -15,5 +15,9 @@
         "32": "icon_32.png",
         "48": "icon_48.png",
         "128": "icon_128.png"
-    }
+    },
+    "background": {
+        "service_worker": "bg.js"
+    },
+    "action": {}
 }

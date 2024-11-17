@@ -19,6 +19,7 @@
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@tsconfig/svelte": "^5.0.4",
+    "@types/chrome": "^0.0.283",
     "@types/dom-chromium-ai": "^0.0.2",
     "@types/express": "^5.0.0",
     "@unocss/reset": "^0.63.6",
