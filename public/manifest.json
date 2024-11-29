@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "version": "2",
+    "version": "3",
     "name": "inferit",
     "description": "Visual inference exploration & experimentation playground",
     "chrome_url_overrides": {
