@@ -11,6 +11,8 @@ this with its UI that allows for an unlimited number of side-by-side
 generations. This makes it a perfect fit to compare and experiment with
 different models, prompts and sampler settings.
 
+![](./screens/24-11-29.png)
+
 ![](./screens/24-11-11_whoami.png)
 
 Some example use cases:
