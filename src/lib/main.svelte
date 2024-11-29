@@ -14,6 +14,7 @@
   import Settings from "./settings.svelte"
   import Online from "./online.svelte"
   import { add_system_node } from "./nodes.js"
+  import Editor from "./editor.svelte"
 
   const node_types: NodeTypes = {
     "custom-system-node": SystemNode,
@@ -32,6 +33,8 @@
   {#if show_settings}
     <Settings close_it={toggle_settings} />
   {/if}
+
+  <Editor />
 
   <SvelteFlow
     colorMode={"dark"}

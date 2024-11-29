@@ -15,15 +15,14 @@
   import { untrack } from "svelte"
   import SyncControl from "./sync_control.svelte"
   import { add_system_node, add_user_node } from "./nodes.js"
+  import { editor_state } from "./editor.svelte.js"
 
   const { screenToFlowPosition } = useSvelteFlow()
 
   let {
     data,
   }: {
-    data: {
-      id: string
-    }
+    data: { id: string }
   } = $props()
 
   const status = writable<"idle" | "busy">("idle")
@@ -71,6 +70,14 @@
     set prompt(prompt: string) {
       $nodes[index].data.params.prompt = prompt
       _params.prompt = prompt
+
+      // if (
+      //   editor_state.ongoing_session &&
+      //   editor_state.node_id === data.id &&
+      //   editor_state.content !== prompt
+      // ) {
+      //   editor_state.content = prompt
+      // }
     },
 
     get max_tokens() {
@@ -160,7 +167,7 @@
 
     nodes.update((the_nodes) => {
       const sys_nodes = the_nodes.filter(
-        (node) => node.type === "custom-system-node"
+        (node) => node.type === "custom-system-node",
       )
 
       sys_nodes.forEach((sys_node) => {
@@ -215,6 +222,24 @@
       status,
     })
   }
+
+  function open_in_editor() {
+    editor_state.ongoing_session = true
+    editor_state.node_id = data.id
+    editor_state.content = params_proxy.prompt
+  }
+
+  $effect(() => {
+    if (
+      !editor_state.ongoing_session ||
+      editor_state.node_id !== data.id ||
+      params_proxy.prompt === editor_state.content
+    ) {
+      return
+    }
+
+    params_proxy.prompt = editor_state.content
+  })
 </script>
 
 <div
@@ -303,11 +328,6 @@ font-mono text-stone-3 border-stone-5"
               value="temperature"
               bind:group={param_syncs_proxy.value}
             />
-            <!-- <input
-              type="checkbox"
-              value="temperature"
-              bind:group={param_syncs_proxy.value}
-            /> -->
             <input
               type="number"
               min="0"
@@ -319,11 +339,6 @@ font-mono text-stone-3 border-stone-5"
 
           <label class="flex items-center space-x-2">
             <SyncControl value="min_p" bind:group={param_syncs_proxy.value} />
-            <!-- <input
-              type="checkbox"
-              value="min_p"
-              bind:group={param_syncs_proxy.value}
-            /> -->
             <input
               type="number"
               min="0"
@@ -336,11 +351,6 @@ font-mono text-stone-3 border-stone-5"
 
           <label class="flex items-center space-x-2">
             <SyncControl value="top_p" bind:group={param_syncs_proxy.value} />
-            <!-- <input
-              type="checkbox"
-              value="top_p"
-              bind:group={param_syncs_proxy.value}
-            /> -->
             <input
               type="number"
               bind:value={params_proxy.top_p}
@@ -351,22 +361,12 @@ font-mono text-stone-3 border-stone-5"
 
           <label class="flex items-center space-x-2">
             <SyncControl value="top_k" bind:group={param_syncs_proxy.value} />
-            <!-- <input
-              type="checkbox"
-              value="top_k"
-              bind:group={param_syncs_proxy.value}
-            /> -->
             <input type="number" bind:value={params_proxy.top_k} />
             <div class="">top_k</div>
           </label>
 
           <label class="flex items-center space-x-2">
             <SyncControl value="stop" bind:group={param_syncs_proxy.value} />
-            <!-- <input
-              type="checkbox"
-              value="stop"
-              bind:group={param_syncs_proxy.value}
-            /> -->
             <input
               type="text"
               bind:value={params_proxy.stop}
@@ -380,11 +380,6 @@ font-mono text-stone-3 border-stone-5"
               value="max_tokens"
               bind:group={param_syncs_proxy.value}
             />
-            <!-- <input
-              type="checkbox"
-              value="max_tokens"
-              bind:group={param_syncs_proxy.value}
-            /> -->
             <input
               type="number"
               min="1"
@@ -402,13 +397,17 @@ font-mono text-stone-3 border-stone-5"
         <div class="mt1.5">
           <SyncControl value="prompt" bind:group={param_syncs_proxy.value} />
         </div>
-        <!-- <input
-          type="checkbox"
-          value="prompt"
-          bind:group={param_syncs_proxy.value}
-        /> -->
+        <div class="flex items-center">
+          <div
+            onclick={open_in_editor}
+            class="i-eva:expand-outline {editor_state.node_id === data.id
+              ? 'text-stone-5'
+              : 'text-stone-3'}"
+          ></div>
+        </div>
       {/if}
       <textarea
+        disabled={editor_state.ongoing_session}
         bind:value={params_proxy.prompt}
         placeholder="System Message"
         use:autosize
@@ -418,6 +417,9 @@ font-mono text-stone-3 border-stone-5"
         onfocusin={() => {
           if (!textarea) return
           autosize.update(textarea)
+        }}
+        onfocusout={(e) => {
+          e.target.style.height = "25px"
         }}
         rows="1"
       ></textarea>
