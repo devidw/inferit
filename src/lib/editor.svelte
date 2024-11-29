@@ -21,21 +21,26 @@
     class="fixed w-xl h-screen right-0 top-0 bg-stone-8 z-1 border-l-1
   border-stone-5 p4 pb12"
   >
-    <div class="flex justify-between mb2 font-mono">
-      {#if import.meta.env.DEV}
+    <div class="flex w-full justify-end mb2 font-mono text-stone-5">
+      {#if import.meta.env.DEV && false}
         <div class="text-xs whitespace-pre">
           {JSON.stringify(editor_state, null, 4)}
         </div>
-        <div
-          onclick={close_editor}
-          class="cursor-pointer i-eva:close-outline text-stone-3 text-lg"
-        ></div>
       {/if}
+      <div
+        onclick={close_editor}
+        class="cursor-pointer flex gap-2 items-center"
+      >
+        <div class="i-eva:close-outline text-lg"></div>
+        <div class="text-xs">Close [ESC]</div>
+      </div>
     </div>
 
     <textarea
       class="w-full h-full font-mono! text-xs leading-150% text-stone-2"
       bind:value={editor_state.content}
+      spellcheck="false"
+      placeholder="System Message"
     ></textarea>
   </div>
 {/if}
